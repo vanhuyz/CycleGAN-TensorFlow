@@ -43,6 +43,7 @@ class Reader():
           )
 
       tf.summary.image('images', images)
+      # TODO: normalize image
       # norm_images = tf.subtract(tf.div(tf.image.resize_images(
       #     images, [s_size * 2 ** 4, s_size * 2 ** 4]), 127.5), 1.0)
     return images
@@ -54,8 +55,8 @@ class Reader():
     return image
 
 def test_reader():
-  TRAIN_FILE_1 = 'data/tfrecords/huy.tfrecords'
-  TRAIN_FILE_2 = 'data/tfrecords/khang.tfrecords'
+  TRAIN_FILE_1 = 'data/tfrecords/apple.tfrecords'
+  TRAIN_FILE_2 = 'data/tfrecords/orange.tfrecords'
 
   with tf.Graph().as_default():
     reader1 = Reader(TRAIN_FILE_1, batch_size=2)

@@ -2,10 +2,10 @@ import tensorflow as tf
 from model import CycleGAN
 from reader import Reader
 
-X_TRAIN_FILE = 'data/tfrecords/orange.tfrecords'
-Y_TRAIN_FILE = 'data/tfrecords/apple.tfrecords'
+X_TRAIN_FILE = 'data/tfrecords/apple.tfrecords'
+Y_TRAIN_FILE = 'data/tfrecords/orange.tfrecords'
 
-BATCH_SIZE = 64
+BATCH_SIZE = 1
 
 def train():
   graph = tf.Graph()
@@ -15,8 +15,8 @@ def train():
     X_reader = Reader(X_TRAIN_FILE, batch_size=BATCH_SIZE)
     Y_reader = Reader(Y_TRAIN_FILE, batch_size=BATCH_SIZE)
 
-    x, _, _ = X_reader.feed()
-    y, _, _ = Y_reader.feed()
+    x = X_reader.feed()
+    y = Y_reader.feed()
 
     loss_op = cycle_gan.loss(x, y)
     optimizer = cycle_gan.optimize(loss_op)

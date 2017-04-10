@@ -48,7 +48,7 @@ def Rk(input, k, reuse=False, name=None):
   """ A residual block that contains two 3x3 convolutional layers
       with the same number of filters on both layer
   """
-  with tf.variable_scope(name):
+  with tf.variable_scope(name, reuse=reuse):
     # layer 1
     weights1 = _weights("weights1",
       shape=[3, 3, input.get_shape()[3], k])
@@ -81,12 +81,16 @@ def uk(input, k, reuse=False, is_training=True, name=None):
   """
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
-      shape=[3, 3, input.get_shape()[3], k])
+      shape=[3, 3, k, input.get_shape()[3]])
     biases = tf.get_variable("biases", [k],
         initializer=tf.constant_initializer(0.0))
 
     # TODO: reflection padding
+    input_shape = input.get_shape()
+    output_size = (int)((int)(input_shape[1])*2)
+    output_shape = [(int)(input_shape[0]), output_size, output_size, k]
     fsconv = tf.nn.conv2d_transpose(input, weights,
+        output_shape=output_shape,
         strides=[1, 2, 2, 1], padding='SAME')
     bn = _batch_norm(fsconv+biases, is_training)
     output = tf.nn.relu(bn)

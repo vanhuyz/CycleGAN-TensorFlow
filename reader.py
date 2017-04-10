@@ -18,10 +18,8 @@ class Reader():
 
   def feed(self):
     """
-    Returns: (images, labels, names)
+    Returns:
       images: 4D tensor [batch_size, image_width, image_height, image_depth]
-      labels: integer list with size=batch_size, e.g. [3,2,50,1]
-      names: byte-string list with size=batch_size, e.g. [b'Orange', b'Apple']
     """
     with tf.name_scope('input'):
       filename_queue = tf.train.string_input_producer([self.tfrecords_file])
@@ -31,8 +29,6 @@ class Reader():
       features = tf.parse_single_example(
           serialized_example,
           features={
-            'image/class/label': tf.FixedLenFeature([], tf.int64),
-            'image/class/name': tf.FixedLenFeature([], tf.string),
             'image/file_name': tf.FixedLenFeature([], tf.string),
             'image/encoded_image': tf.FixedLenFeature([], tf.string),
           })
@@ -40,27 +36,57 @@ class Reader():
       image_buffer = features['image/encoded_image']
       image = tf.image.decode_jpeg(image_buffer, channels=3)
       image = self._preprocess(image)
-      label = features['image/class/label']
-      name = features['image/class/name']
-      images, labels, names = tf.train.shuffle_batch(
-            [image, label, name], batch_size=self.batch_size, num_threads=self.num_threads,
+      images = tf.train.shuffle_batch(
+            [image], batch_size=self.batch_size, num_threads=self.num_threads,
             capacity=self.min_queue_examples + 3*self.batch_size,
             min_after_dequeue=self.min_queue_examples
           )
 
       tf.summary.image('images', images)
-      norm_images = tf.subtract(tf.div(tf.image.resize_images(
-          images, [s_size * 2 ** 4, s_size * 2 ** 4]), 127.5), 1.0)
-    return norm_images, labels, names
+      # norm_images = tf.subtract(tf.div(tf.image.resize_images(
+      #     images, [s_size * 2 ** 4, s_size * 2 ** 4]), 127.5), 1.0)
+    return images
 
   def _preprocess(self, image):
-    image = tf.image.resize_image_with_crop_or_pad(image, size=(self.image_size, self.image_size))
+    image = tf.image.resize_images(image, size=(self.image_size, self.image_size))
     image = tf.image.convert_image_dtype(image, dtype=tf.float32)
-    # image = tf.random_crop(image, [self.image_size, self.image_size, 3])
-    # image = tf.image.random_brightness(image, max_delta=0.4)
-    # image = tf.image.random_contrast(image, lower=0.6, upper=1.4)
-    # image = tf.image.random_hue(image, max_delta=0.04)
-    # image = tf.image.random_saturation(image, lower=0.6, upper=1.4)
-    # image = tf.image.per_image_standardization(image)
     image.set_shape([self.image_size, self.image_size, 3])
     return image
+
+def test_reader():
+  TRAIN_FILE_1 = 'data/tfrecords/huy.tfrecords'
+  TRAIN_FILE_2 = 'data/tfrecords/khang.tfrecords'
+
+  with tf.Graph().as_default():
+    reader1 = Reader(TRAIN_FILE_1, batch_size=2)
+    reader2 = Reader(TRAIN_FILE_2, batch_size=2)
+    images_op1 = reader1.feed()
+    images_op2 = reader2.feed()
+
+    sess = tf.Session()
+    init = tf.global_variables_initializer()
+    sess.run(init)
+
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+
+    try:
+      step = 0
+      while not coord.should_stop():
+        batch_images1, batch_images2 = sess.run([images_op1, images_op2])
+        print("image shape: {}".format(batch_images1.shape))
+        print("image shape: {}".format(batch_images2.shape))
+        print("="*10)
+        step += 1
+    except KeyboardInterrupt:
+      print('Interrupted')
+      coord.request_stop()
+    except Exception as e:
+      coord.request_stop(e)
+    finally:
+      # When done, ask the threads to stop.
+      coord.request_stop()
+      coord.join(threads)
+
+if __name__ == '__main__':
+  test_reader()

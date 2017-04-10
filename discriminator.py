@@ -10,7 +10,7 @@ class Discriminator:
     Args:
       input: batch_size x 128 x 128 x 3
     Returns:
-      output: 1 if real, 0 if fake
+      output: 1D (1 if real, 0 if fake)
     """
     C64 = ops.Ck(input, 64, use_batchnorm=False, name='C64') # (?, 64, 64, 64)
     C128 = ops.Ck(C64, 128, name='C128')                     # (?, 32, 32, 128)

@@ -36,6 +36,6 @@ class Generator:
 
     # set reuse=True for next call
     self.reuse = True
-    self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
+    self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
     # print(self.variables)
     return output

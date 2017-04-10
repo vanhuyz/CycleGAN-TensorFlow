@@ -43,14 +43,12 @@ class Reader():
           )
 
       tf.summary.image('images', images)
-      # TODO: normalize image
-      # norm_images = tf.subtract(tf.div(tf.image.resize_images(
-      #     images, [s_size * 2 ** 4, s_size * 2 ** 4]), 127.5), 1.0)
     return images
 
   def _preprocess(self, image):
     image = tf.image.resize_images(image, size=(self.image_size, self.image_size))
     image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+    image = tf.image.per_image_standardization(image)
     image.set_shape([self.image_size, self.image_size, 3])
     return image
 
@@ -75,8 +73,8 @@ def test_reader():
       step = 0
       while not coord.should_stop():
         batch_images1, batch_images2 = sess.run([images_op1, images_op2])
-        print("image shape: {}".format(batch_images1.shape))
-        print("image shape: {}".format(batch_images2.shape))
+        print("image shape: {}".format(batch_images1))
+        print("image shape: {}".format(batch_images2))
         print("="*10)
         step += 1
     except KeyboardInterrupt:

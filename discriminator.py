@@ -24,6 +24,6 @@ class Discriminator:
       output = tf.squeeze(C1, name='output')                                     # (?)
 
     self.reuse = True
-    self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
+    self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
 
     return output

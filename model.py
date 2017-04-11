@@ -36,7 +36,7 @@ class CycleGAN:
         self.Lambda*cycle_loss
 
     # F discriminator loss: cross entropy
-    D_X_loss = -(tf.reduce_mean(ops.safe_log(self.D_X(x))) - \
+    D_X_loss = (-tf.reduce_mean(ops.safe_log(self.D_X(x))) - \
         tf.reduce_mean(ops.safe_log(1-self.D_X(self.F(y))))) / 2
     # D_X_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(self.D_X(x)), logits=self.D_X(x))) + \
     #     tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.zeros_like(self.D_X(x)), logits=self.D_X(self.F(y))))

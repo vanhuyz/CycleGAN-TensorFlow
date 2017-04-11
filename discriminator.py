@@ -20,6 +20,7 @@ class Discriminator:
       C512 = ops.Ck(C256, 512, reuse=self.reuse, name='C512')                    # (?, 8, 8, 512)
 
       # apply a convolution to produce a 1 dimensional output (1 channel?)
+      # TODO: don't use leakyReLU and batch norm here
       output = tf.sigmoid(ops.Ck(C512, 1, reuse=self.reuse, stride=1, name='C1'), name='output')        # (?, 8, 8, 1)
 
     self.reuse = True

@@ -18,8 +18,8 @@ def train():
   cycle_gan = CycleGAN()
 
   with graph.as_default():
-    X_reader = Reader(X_TRAIN_FILE, batch_size=BATCH_SIZE, name='X_input')
-    Y_reader = Reader(Y_TRAIN_FILE, batch_size=BATCH_SIZE, name='Y_input')
+    X_reader = Reader(X_TRAIN_FILE, batch_size=BATCH_SIZE, name='X')
+    Y_reader = Reader(Y_TRAIN_FILE, batch_size=BATCH_SIZE, name='Y')
 
     x = X_reader.feed()
     y = Y_reader.feed()

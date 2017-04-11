@@ -19,9 +19,8 @@ class Discriminator:
       C256 = ops.Ck(C128, 256, reuse=self.reuse, name='C256')                    # (?, 16, 16, 256)
       C512 = ops.Ck(C256, 512, reuse=self.reuse, name='C512')                    # (?, 8, 8, 512)
 
-      # apply a convolution to produce a 1 dimensional output
-      C1 = ops.Ck(C512, 1, reuse=self.reuse, stride=8, name='C1')                # (?, 1, 1, 1)
-      output = tf.squeeze(C1, name='output')                                     # (?)
+      # apply a convolution to produce a 1 dimensional output (1 channel?)
+      output = tf.sigmoid(ops.Ck(C512, 1, reuse=self.reuse, stride=1, name='C1'), name='output')        # (?, 8, 8, 1)
 
     self.reuse = True
     self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)

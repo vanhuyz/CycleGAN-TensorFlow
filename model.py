@@ -20,23 +20,29 @@ class CycleGAN:
     G_loss = -tf.reduce_mean(ops.safe_log(self.D_Y(self.G(x)))) / 2 + \
         self.Lambda*cycle_loss
 
-    # G discriminator loss
+    # G discriminator loss: cross entropy
+    # note: D_Y(y).shape == (batch_size,8,8,1)
+    # try to calculate directly since not use sigmoid but -> nan
     D_Y_loss = (-tf.reduce_mean(ops.safe_log(self.D_Y(y))) - \
-        tf.reduce_mean(ops.safe_log(1-self.D_Y(self.G(x))))) / 2
+       tf.reduce_mean(ops.safe_log(1-self.D_Y(self.G(x))))) / 2
+    # D_Y_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(self.D_Y(y)), logits=self.D_Y(y))) + \
+    #     tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.zeros_like(self.D_Y(y)), logits=self.D_Y(self.G(x))))
 
-    tf.summary.scalar('D_Y/true', self.D_Y(y))
-    tf.summary.scalar('D_Y/fake', self.D_Y(self.G(x)))
+    tf.summary.histogram('D_Y/true', self.D_Y(y))
+    tf.summary.histogram('D_Y/fake', self.D_Y(self.G(x)))
 
     # F generator loss (Heuristic, non-saturating)
     F_loss = -tf.reduce_mean(ops.safe_log(self.D_X(self.G(y)))) / 2 + \
         self.Lambda*cycle_loss
 
-    # F discriminator loss
+    # F discriminator loss: cross entropy
     D_X_loss = -(tf.reduce_mean(ops.safe_log(self.D_X(x))) - \
         tf.reduce_mean(ops.safe_log(1-self.D_X(self.F(y))))) / 2
+    # D_X_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(self.D_X(x)), logits=self.D_X(x))) + \
+    #     tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.zeros_like(self.D_X(x)), logits=self.D_X(self.F(y))))
 
-    tf.summary.scalar('D_X/true', self.D_X(x))
-    tf.summary.scalar('D_X/fake', self.D_X(self.F(y)))
+    tf.summary.histogram('D_X/true', self.D_X(x))
+    tf.summary.histogram('D_X/fake', self.D_X(self.F(y)))
 
     # total_loss = G_loss + F_loss + self.Lambda*cycle_loss
     tf.summary.scalar('loss/G', G_loss)
@@ -45,11 +51,11 @@ class CycleGAN:
     tf.summary.scalar('loss/D_X', D_X_loss)
     tf.summary.scalar('loss/cycle', cycle_loss)
 
-    tf.summary.image('X/origin', x)
+    # tf.summary.image('X/origin', x)
     tf.summary.image('X/generated', self.G(x))
     tf.summary.image('X/reconstruction', self.F(self.G(x)))
 
-    tf.summary.image('Y/origin', y)
+    # tf.summary.image('Y/origin', y)
     tf.summary.image('Y/generated', self.F(y))
     tf.summary.image('Y/reconstruction', self.G(self.F(y)))
 

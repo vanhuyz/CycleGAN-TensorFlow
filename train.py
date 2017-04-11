@@ -1,6 +1,8 @@
 import tensorflow as tf
 from model import CycleGAN
 from reader import Reader
+from datetime import datetime
+import os
 
 X_TRAIN_FILE = 'data/tfrecords/apple.tfrecords'
 Y_TRAIN_FILE = 'data/tfrecords/orange.tfrecords'
@@ -8,18 +10,26 @@ Y_TRAIN_FILE = 'data/tfrecords/orange.tfrecords'
 BATCH_SIZE = 1
 
 def train():
+  current_time = datetime.now().strftime("%Y%m%d-%H%M")
+  checkpoints_dir = "checkpoints/{}".format(current_time)
+  os.makedirs(checkpoints_dir, exist_ok=True)
+
   graph = tf.Graph()
   cycle_gan = CycleGAN()
 
   with graph.as_default():
-    X_reader = Reader(X_TRAIN_FILE, batch_size=BATCH_SIZE)
-    Y_reader = Reader(Y_TRAIN_FILE, batch_size=BATCH_SIZE)
+    X_reader = Reader(X_TRAIN_FILE, batch_size=BATCH_SIZE, name='X_input')
+    Y_reader = Reader(Y_TRAIN_FILE, batch_size=BATCH_SIZE, name='Y_input')
 
     x = X_reader.feed()
     y = Y_reader.feed()
 
-    loss_op = cycle_gan.loss(x, y)
-    optimizer = cycle_gan.optimize(loss_op)
+    G_loss, D_Y_loss, F_loss, D_X_loss, summary_op = cycle_gan.model(x, y)
+    optimizer = cycle_gan.optimize(G_loss, D_Y_loss, F_loss, D_X_loss)
+
+    saver = tf.train.Saver()
+
+  train_writer = tf.summary.FileWriter(checkpoints_dir, graph)
 
   with tf.Session(graph=graph) as sess:
     sess.run(tf.global_variables_initializer())
@@ -30,10 +40,21 @@ def train():
     try:
       step = 0
       while not coord.should_stop():
-        _, loss = sess.run([optimizer, loss_op])
+        _, G_loss_val, D_Y_loss_val, F_loss_val, D_X_loss_val, summary = \
+            sess.run([optimizer, G_loss, D_Y_loss, F_loss, D_X_loss, summary_op])
+
+        train_writer.add_summary(summary, step)
+        train_writer.flush()
 
         print('-----------Step %d:-------------' % step)
-        print('  Loss   : {}'.format(loss))
+        print('  G_loss   : {}'.format(G_loss_val))
+        print('  D_Y_loss   : {}'.format(D_Y_loss_val))
+        print('  F_loss   : {}'.format(F_loss_val))
+        print('  D_X_loss   : {}'.format(D_X_loss_val))
+
+        if step % 10 == 0:
+          save_path = saver.save(sess, checkpoints_dir + "/model.ckpt")
+          print("Model saved in file: %s" % save_path)
 
         step += 1
 
@@ -43,8 +64,8 @@ def train():
     except Exception as e:
       coord.request_stop(e)
     finally:
-      # save_path = saver.save(sess, checkpoints_dir + "/model.ckpt")
-      # print("Model saved in file: %s" % save_path)
+      save_path = saver.save(sess, checkpoints_dir + "/model.ckpt")
+      print("Model saved in file: %s" % save_path)
       # When done, ask the threads to stop.
       coord.request_stop()
       coord.join(threads)

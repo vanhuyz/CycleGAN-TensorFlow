@@ -89,8 +89,8 @@ def data_writer(input_dir):
 
 if __name__ == '__main__':
   print("Dump apple data...")
-  input_dir = '/tmp/data/apple'
+  input_dir = 'data/apple'
   data_writer(input_dir)
   print("Dump orange data...")
-  input_dir = '/tmp/data/orange'
+  input_dir = 'data/orange'
   data_writer(input_dir)

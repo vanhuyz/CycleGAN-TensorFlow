@@ -141,5 +141,10 @@ def _leaky_relu(input, slope):
 
 def _batch_norm(input, is_training):
   """ TODO: set hyper-parameter
+      TODO: instance normalization
   """
   return tf.contrib.layers.batch_norm(input, decay=0.9, is_training=is_training)
+
+def safe_log(x, eps=1e-12):
+  return tf.log(x + eps)
+

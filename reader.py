@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 class Reader():
-  def __init__(self, tfrecords_file, image_size=128, min_queue_examples=1000, batch_size=32, num_threads=8):
+  def __init__(self, tfrecords_file, image_size=128, min_queue_examples=1000, batch_size=32, num_threads=8, name=''):
     """
     Args:
       tfrecords_file: string, tfrecords file path
@@ -15,13 +15,14 @@ class Reader():
     self.batch_size = batch_size
     self.num_threads = num_threads
     self.reader = tf.TFRecordReader()
+    self.name = name
 
   def feed(self):
     """
     Returns:
       images: 4D tensor [batch_size, image_width, image_height, image_depth]
     """
-    with tf.name_scope('input'):
+    with tf.name_scope(self.name):
       filename_queue = tf.train.string_input_producer([self.tfrecords_file])
       reader = tf.TFRecordReader()
 

@@ -91,12 +91,13 @@ class CycleGAN:
     return G_loss, D_Y_loss, F_loss, D_X_loss, summary_op
 
   def optimize(self, G_loss, D_Y_loss, F_loss, D_X_loss):
-    optimizer = tf.train.AdamOptimizer(learning_rate=2e-4)
+    def make_optimizer(loss, variables):
+      return tf.train.AdamOptimizer(learning_rate=2e-4).minimize(loss, var_list=variables)
 
-    G_minimizer = optimizer.minimize(G_loss, var_list=self.G.variables)
-    D_Y_minimizer = optimizer.minimize(D_Y_loss, var_list=self.D_Y.variables)
-    F_minimizer = optimizer.minimize(F_loss, var_list=self.F.variables)
-    D_X_minimizer = optimizer.minimize(D_X_loss, var_list=self.D_X.variables)
+    G_optimizer = make_optimizer(G_loss, self.G.variables)
+    D_Y_optimizer = make_optimizer(D_Y_loss, self.D_Y.variables)
+    F_optimizer =  make_optimizer(F_loss, self.F.variables)
+    D_X_optimizer = make_optimizer(D_X_loss, self.D_X.variables)
 
-    with tf.control_dependencies([G_minimizer, D_Y_minimizer, F_minimizer, D_X_minimizer]):
+    with tf.control_dependencies([G_optimizer, D_Y_optimizer, F_optimizer, D_X_optimizer]):
       return tf.no_op(name='train')

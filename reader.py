@@ -1,4 +1,5 @@
 import tensorflow as tf
+import utils
 
 class Reader():
   def __init__(self, tfrecords_file, image_size=128, min_queue_examples=1000, batch_size=32, num_threads=8, name=''):
@@ -43,14 +44,12 @@ class Reader():
             min_after_dequeue=self.min_queue_examples
           )
 
-      tf.summary.image('images', images)
+      tf.summary.image('input', images)
     return images
 
   def _preprocess(self, image):
     image = tf.image.resize_images(image, size=(self.image_size, self.image_size))
-    image = tf.image.convert_image_dtype(image, dtype=tf.float32)
-    # image = tf.image.per_image_standardization(image)
-    image = (image/127.5) - 1.0
+    image = utils.convert2float(image)
     image.set_shape([self.image_size, self.image_size, 3])
     return image
 

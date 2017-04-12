@@ -12,7 +12,7 @@ class Discriminator:
     Args:
       input: batch_size x 128 x 128 x 3
     Returns:
-      output: 1D (1 if real, 0 if fake)
+      output: 4D tensor batch_size x image_size/8 x image_size/8 x 1 filled with 1 if real, 0 if fake
     """
     with tf.variable_scope(self.name):
       C64 = ops.Ck(input, 64, reuse=self.reuse, use_batchnorm=False, name='C64') # (?, 64, 64, 64)
@@ -22,7 +22,8 @@ class Discriminator:
 
       # apply a convolution to produce a 1 dimensional output (1 channel?)
       # set use_sigmoid = False if use_lsgan == True
-      output = ops.last_conv(C512, reuse=self.reuse, use_sigmoid=self.use_sigmoid, name='output') # (?, 8, 8, 1)
+      output = ops.last_conv(C512,
+          reuse=self.reuse, use_sigmoid=self.use_sigmoid, name='output')         # (?, 8, 8, 1)
 
     self.reuse = True
     self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)

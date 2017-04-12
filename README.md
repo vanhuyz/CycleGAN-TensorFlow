@@ -27,6 +27,12 @@ $ python dump.py
 $ python train.py
 ```
 
+Check TensorBoard to see training progress and generated images.
+
+```
+$ tensorboard --logdir checkpoints/${datetime}
+```
+
 ## TODO:
 
 * PatchGAN for discriminators

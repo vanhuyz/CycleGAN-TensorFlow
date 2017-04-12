@@ -49,7 +49,8 @@ class Reader():
   def _preprocess(self, image):
     image = tf.image.resize_images(image, size=(self.image_size, self.image_size))
     image = tf.image.convert_image_dtype(image, dtype=tf.float32)
-    image = tf.image.per_image_standardization(image)
+    # image = tf.image.per_image_standardization(image)
+    image = (image/127.5) - 1.0
     image.set_shape([self.image_size, self.image_size, 3])
     return image
 

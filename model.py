@@ -54,6 +54,11 @@ class CycleGAN:
     loss = self.lambda1*forward_loss + self.lambda2*backward_loss
     return loss
 
+  def convert2int(image):
+    """ Transfrom from float image ([0.,1.]) to int image ([0,255])
+    """
+    return tf.image.convert_image_dtype((image+1.0)/2.0, tf.uint8)
+
   def model(self, x, y):
     cycle_loss = self.cycle_consistency_loss(self.G, self.F, x, y)
 
@@ -80,10 +85,10 @@ class CycleGAN:
     tf.summary.scalar('loss/D_X', D_X_loss)
     tf.summary.scalar('loss/cycle', cycle_loss)
 
-    tf.summary.image('X/generated', self.G(x))
-    tf.summary.image('X/reconstruction', self.F(self.G(x)))
-    tf.summary.image('Y/generated', self.F(y))
-    tf.summary.image('Y/reconstruction', self.G(self.F(y)))
+    tf.summary.image('X/generated', convert2int(self.G(x)))
+    tf.summary.image('X/reconstruction', convert2int(self.F(self.G(x))))
+    tf.summary.image('Y/generated', convert2int(self.F(y)))
+    tf.summary.image('Y/reconstruction', convert2int(self.G(self.F(y))))
 
     summary_op = tf.summary.merge_all()
 

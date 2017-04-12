@@ -46,14 +46,15 @@ def train():
         train_writer.add_summary(summary, step)
         train_writer.flush()
 
-        print('-----------Step %d:-------------' % step)
-        print('  G_loss   : {}'.format(G_loss_val))
-        print('  D_Y_loss   : {}'.format(D_Y_loss_val))
-        print('  F_loss   : {}'.format(F_loss_val))
-        print('  D_X_loss   : {}'.format(D_X_loss_val))
+        if step % 100 == 0:
+          print('-----------Step %d:-------------' % step)
+          print('  G_loss   : {}'.format(G_loss_val))
+          print('  D_Y_loss   : {}'.format(D_Y_loss_val))
+          print('  F_loss   : {}'.format(F_loss_val))
+          print('  D_X_loss   : {}'.format(D_X_loss_val))
 
-        if step % 10 == 0:
-          save_path = saver.save(sess, checkpoints_dir + "/model.ckpt")
+        if step % 1000 == 0:
+          save_path = saver.save(sess, checkpoints_dir + "/model.ckpt", global_step=step)
           print("Model saved in file: %s" % save_path)
 
         step += 1

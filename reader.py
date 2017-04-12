@@ -44,7 +44,7 @@ class Reader():
             min_after_dequeue=self.min_queue_examples
           )
 
-      tf.summary.image('input', images)
+      tf.summary.image('_input', images)
     return images
 
   def _preprocess(self, image):

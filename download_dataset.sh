@@ -8,9 +8,9 @@ if [[ $FILE != "ae_photos" && $FILE != "apple2orange" && $FILE != "summer2winter
 fi
 
 URL=https://people.eecs.berkeley.edu/~taesung_park/CycleGAN/datasets/$FILE.zip
-ZIP_FILE=./datasets/$FILE.zip
-TARGET_DIR=./datasets/$FILE/
+ZIP_FILE=./data/$FILE.zip
+TARGET_DIR=./data/$FILE/
 wget -N $URL -O $ZIP_FILE
 mkdir $TARGET_DIR
-unzip $ZIP_FILE -d ./datasets/
+unzip $ZIP_FILE -d ./data/
 rm $ZIP_FILE

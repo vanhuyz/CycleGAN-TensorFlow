@@ -60,11 +60,12 @@ def _convert_to_example(file_path, image_buffer):
     }))
   return example
 
-def data_writer(input_dir):
+def data_writer(input_dir, file_name=None):
   """Write data to tfrecords
   """
   file_paths = data_reader(input_dir)
-  file_name = input_dir.split('/')[-1]
+  if file_name == None:
+    file_name = input_dir.split('/')[-1]
 
   tfrecords_dir = 'data/tfrecords/'
   os.makedirs(tfrecords_dir, exist_ok=True)
@@ -89,8 +90,8 @@ def data_writer(input_dir):
 
 if __name__ == '__main__':
   print("Dump apple data...")
-  input_dir = 'data/apple'
-  data_writer(input_dir)
+  input_dir = 'data/apple2orange/trainA'
+  data_writer(input_dir, 'apple')
   print("Dump orange data...")
-  input_dir = 'data/orange'
-  data_writer(input_dir)
+  input_dir = 'data/apple2orange/trainB'
+  data_writer(input_dir, 'orange')

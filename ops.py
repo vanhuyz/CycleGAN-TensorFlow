@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+## Layers
 def c7s1_k(input, k, reuse=False, is_training=True, name=None):
   """ A 7x7 Convolution-BatchNorm-ReLU layer with k filters and stride 1
   Args:
@@ -119,6 +120,22 @@ def Ck(input, k, slope=0.2, stride=2, reuse=False, use_batchnorm=True, is_traini
     if use_batchnorm:
       h = _batch_norm(h, is_training)
     output = _leaky_relu(h, slope)
+    return output
+
+def last_conv(input, reuse=False, use_sigmoid=False, name=None):
+  """ Last convolutional layer of discriminator network
+      (1 filter with size 4x4, stride 1)
+  """
+  with tf.variable_scope(name, reuse=reuse):
+    weights = _weights("weights",
+      shape=[4, 4, input.get_shape()[3], 1])
+    biases = tf.get_variable("biases", [1],
+        initializer=tf.constant_initializer(0.0))
+    conv = tf.nn.conv2d(input, weights,
+        strides=[1, 1, 1, 1], padding='SAME')
+    output = conv + biases
+    if use_sigmoid:
+      output = tf.sigmoid(output)
     return output
 
 ### Helpers

@@ -18,7 +18,7 @@ def batch_convert2int(images):
   Returns:
     4D int tensor
   """
-  return [convert2int(image) for image in images]
+  return tf.map_fn(convert2int, images, dtype=tf.uint8)
 
 def batch_convert2float(images):
   """
@@ -27,4 +27,4 @@ def batch_convert2float(images):
   Returns:
     4D float tensor
   """
-  return [convert2float(image) for image in images]
+  return tf.map_fn(convert2float, images, dtype=tf.float32)

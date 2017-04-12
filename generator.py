@@ -32,7 +32,8 @@ class Generator:
       u32 = ops.uk(u64, 32, reuse=self.reuse, name='u32')               # (?, 128, 128, 32)
 
       # convolution
-      output = ops.c7s1_k(u32, 3, reuse=self.reuse, name='output')      # (?, 128, 128, 3)
+      c7s1_3 = ops.c7s1_k(u32, 3, reuse=self.reuse, name='c7s1_3')      # (?, 128, 128, 3)
+      output = tf.tanh(c7s1_3, name='output')
 
     # set reuse=True for next call
     self.reuse = True

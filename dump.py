@@ -45,10 +45,6 @@ def _convert_to_example(file_path, image_buffer):
   Args:
     file_path: string, path to an image file, e.g., '/path/to/example.JPG'
     image_buffer: string, JPEG encoding of RGB image
-    label: integer, identifier for the ground truth for the network
-    name: string, unique human-readable, e.g. 'Orange'
-    height: integer, image height in pixels
-    width: integer, image width in pixels
   Returns:
     Example proto
   """

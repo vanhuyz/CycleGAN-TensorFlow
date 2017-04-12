@@ -39,5 +39,6 @@ $ tensorboard --logdir checkpoints/${datetime}
 * Instance normalization
 * Update discriminators using a history of generated images
 * Learning rate decay
+* Image padding
 * Smooth label?
 * Sample images

@@ -15,7 +15,7 @@ def train():
   os.makedirs(checkpoints_dir, exist_ok=True)
 
   graph = tf.Graph()
-  cycle_gan = CycleGAN()
+  cycle_gan = CycleGAN(use_lsgan=True)
 
   with graph.as_default():
     X_reader = Reader(X_TRAIN_FILE, batch_size=BATCH_SIZE, name='X')

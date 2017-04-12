@@ -2,9 +2,10 @@ import tensorflow as tf
 import ops
 
 class Discriminator:
-  def __init__(self, name):
+  def __init__(self, name, use_sigmoid=False):
     self.name = name
     self.reuse = False
+    self.use_sigmoid = use_sigmoid
 
   def __call__(self, input):
     """
@@ -20,7 +21,8 @@ class Discriminator:
       C512 = ops.Ck(C256, 512, reuse=self.reuse, name='C512')                    # (?, 8, 8, 512)
 
       # apply a convolution to produce a 1 dimensional output (1 channel?)
-      output = ops.last_conv(C512, reuse=self.reuse, use_sigmoid=True, name='output') # (?, 8, 8, 1)
+      # set use_sigmoid = False if use_lsgan == True
+      output = ops.last_conv(C512, reuse=self.reuse, use_sigmoid=self.use_sigmoid, name='output') # (?, 8, 8, 1)
 
     self.reuse = True
     self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)

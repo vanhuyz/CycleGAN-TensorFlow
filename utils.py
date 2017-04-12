@@ -10,3 +10,21 @@ def convert2float(image):
   """
   image = tf.image.convert_image_dtype(image, dtype=tf.float32)
   return (image/127.5) - 1.0
+
+def batch_convert2int(images):
+  """
+  Args:
+    images: 4D float tensor (batch_size, image_size, image_size, depth)
+  Returns:
+    4D int tensor
+  """
+  return [convert2int(image) for image in images]
+
+def batch_convert2float(images):
+  """
+  Args:
+    images: 4D int tensor (batch_size, image_size, image_size, depth)
+  Returns:
+    4D float tensor
+  """
+  return [convert2float(image) for image in images]

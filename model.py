@@ -31,7 +31,7 @@ class CycleGAN:
     tf.summary.histogram('D_Y/fake', self.D_Y(self.G(x)))
 
     # F generator loss (Heuristic, non-saturating)
-    F_gan_loss = -tf.reduce_mean(ops.safe_log(self.D_X(self.G(y)))) / 2
+    F_gan_loss = -tf.reduce_mean(ops.safe_log(self.D_X(self.F(y)))) / 2
     F_loss =F_gan_loss + self.Lambda*cycle_loss
 
     # F discriminator loss: cross entropy

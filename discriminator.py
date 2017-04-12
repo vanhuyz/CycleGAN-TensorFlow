@@ -10,9 +10,10 @@ class Discriminator:
   def __call__(self, input):
     """
     Args:
-      input: batch_size x 128 x 128 x 3
+      input: batch_size x image_size x image_size x 3
     Returns:
-      output: 4D tensor batch_size x image_size/8 x image_size/8 x 1 filled with 1 if real, 0 if fake
+      output: 4D tensor batch_size x image_size/16 x image_size/16 x 1
+              filled with 1 if real, 0 if fake
     """
     with tf.variable_scope(self.name):
       C64 = ops.Ck(input, 64, reuse=self.reuse, use_batchnorm=False, name='C64') # (?, 64, 64, 64)

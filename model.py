@@ -22,7 +22,7 @@ class CycleGAN:
     self.D_X = Discriminator('D_X', use_sigmoid=use_sigmoid)
 
   def discriminator_loss(self, G, D, x, y, use_lsgan=True):
-    """ note: D(x).shape == (batch_size,8,8,1)
+    """ note: D(y).shape == (batch_size,8,8,1)
     """
     if use_lsgan:
       # use mean squared error
@@ -57,6 +57,7 @@ class CycleGAN:
   def model(self, x, y):
     cycle_loss = self.cycle_consistency_loss(self.G, self.F, x, y)
 
+    # X -> Y
     G_gan_loss = self.generator_loss(self.G, self.D_Y, x, use_lsgan=self.use_lsgan)
     G_loss =  G_gan_loss + cycle_loss
     D_Y_loss = self.discriminator_loss(self.G, self.D_Y, x, y, use_lsgan=self.use_lsgan)
@@ -64,10 +65,12 @@ class CycleGAN:
     tf.summary.histogram('D_Y/true', self.D_Y(y))
     tf.summary.histogram('D_Y/fake', self.D_Y(self.G(x)))
 
+    # Y -> X
     F_gan_loss = self.generator_loss(self.F, self.D_X, y, use_lsgan=self.use_lsgan)
-    F_loss =F_gan_loss + cycle_loss
+    F_loss = F_gan_loss + cycle_loss
     D_X_loss = self.discriminator_loss(self.F, self.D_X, y, x, use_lsgan=self.use_lsgan)
 
+    # summary
     tf.summary.histogram('D_X/true', self.D_X(x))
     tf.summary.histogram('D_X/fake', self.D_X(self.F(y)))
 

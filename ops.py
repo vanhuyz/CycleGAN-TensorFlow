@@ -38,7 +38,6 @@ def dk(input, k, reuse=False, is_training=True, name=None):
     biases = tf.get_variable("biases", [k],
         initializer=tf.constant_initializer(0.0))
 
-    # TODO: reflection padding
     conv = tf.nn.conv2d(input, weights,
         strides=[1, 2, 2, 1], padding='SAME')
     bn = _batch_norm(conv+biases, is_training)
@@ -89,7 +88,6 @@ def uk(input, k, reuse=False, is_training=True, name=None):
     biases = tf.get_variable("biases", [k],
         initializer=tf.constant_initializer(0.0))
 
-    # TODO: reflection padding
     input_shape = input.get_shape()
     output_size = (int)((int)(input_shape[1])*2)
     output_shape = [(int)(input_shape[0]), output_size, output_size, k]

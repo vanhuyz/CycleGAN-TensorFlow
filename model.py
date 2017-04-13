@@ -39,8 +39,16 @@ class CycleGAN:
     self.fake_buffer_G = tf.concat([self.fake_buffer_G[1:,:,:,:], self.G(x)], axis=0)
     self.fake_buffer_F = tf.concat([self.fake_buffer_F[1:,:,:,:], self.F(y)], axis=0)
 
-  def discriminator_loss(self, G, D, fake_buffer, x, y, use_lsgan=True):
-    """ note: D(y).shape == (batch_size,8,8,1)
+  def discriminator_loss(self, G, D, fake_buffer, y, use_lsgan=True):
+    """ note: D(y).shape == (batch_size,8,8,1), default fake_buffer_size=50, batch_size=1
+    Seems unbalanced?
+    Args:
+      G: generator object
+      D: discriminator object
+      fake_buffer: 4D tensor (fake_buffer_size, image_size, image_size, 3)
+      y: 4D tensor (batch_size, image_size, image_size, 3)
+    Returns:
+      loss: scalar
     """
     if use_lsgan:
       # use mean squared error
@@ -79,7 +87,7 @@ class CycleGAN:
     # X -> Y
     G_gan_loss = self.generator_loss(self.G, self.D_Y, x, use_lsgan=self.use_lsgan)
     G_loss =  G_gan_loss + cycle_loss
-    D_Y_loss = self.discriminator_loss(self.G, self.D_Y, self.fake_buffer_G,  x, y, use_lsgan=self.use_lsgan)
+    D_Y_loss = self.discriminator_loss(self.G, self.D_Y, self.fake_buffer_G, y, use_lsgan=self.use_lsgan)
 
     tf.summary.histogram('D_Y/true', self.D_Y(y))
     tf.summary.histogram('D_Y/fake', self.D_Y(self.G(x)))
@@ -87,7 +95,7 @@ class CycleGAN:
     # Y -> X
     F_gan_loss = self.generator_loss(self.F, self.D_X, y, use_lsgan=self.use_lsgan)
     F_loss = F_gan_loss + cycle_loss
-    D_X_loss = self.discriminator_loss(self.F, self.D_X, self.fake_buffer_F, y, x, use_lsgan=self.use_lsgan)
+    D_X_loss = self.discriminator_loss(self.F, self.D_X, self.fake_buffer_F, x, use_lsgan=self.use_lsgan)
 
     # summary
     tf.summary.histogram('D_X/true', self.D_X(x))

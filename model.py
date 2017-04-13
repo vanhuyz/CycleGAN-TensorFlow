@@ -4,6 +4,8 @@ import utils
 from discriminator import Discriminator
 from generator import Generator
 
+REAL_LABEL = 0.9
+
 class CycleGAN:
   def __init__(self, batch_size=1, fake_buffer_size=50,
     image_size=128, use_lsgan=True, lambda1=10, lambda2=10):
@@ -52,7 +54,7 @@ class CycleGAN:
     """
     if use_lsgan:
       # use mean squared error
-      error_real = tf.reduce_mean(tf.squared_difference(D(y),1))
+      error_real = tf.reduce_mean(tf.squared_difference(D(y), REAL_LABEL))
       error_fake = tf.reduce_mean(tf.square(D(fake_buffer)))
     else:
       # use cross entropy
@@ -66,7 +68,7 @@ class CycleGAN:
     """
     if use_lsgan:
       # use mean squared error
-      loss = tf.reduce_mean(tf.squared_difference(D(G(x)),1))
+      loss = tf.reduce_mean(tf.squared_difference(D(G(x)), REAL_LABEL))
     else:
       # heuristic, non-saturating loss
       loss = -tf.reduce_mean(ops.safe_log(D(G(x)))) / 2

@@ -37,7 +37,6 @@ $ tensorboard --logdir checkpoints/${datetime}
 
 * PatchGAN for discriminators
 * Instance normalization
-* Learning rate decay
 * Image padding
 * Smooth label?
 * Sample images

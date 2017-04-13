@@ -21,7 +21,7 @@ $ bash download_dataset.sh apple2orange
 $ python dump.py
 ```
 
-## Train
+## Training
 
 ```bash
 $ python train.py
@@ -37,7 +37,6 @@ $ tensorboard --logdir checkpoints/${datetime}
 
 * PatchGAN for discriminators
 * Instance normalization
-* Update discriminators using a history of generated images
 * Learning rate decay
 * Image padding
 * Smooth label?

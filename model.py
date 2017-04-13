@@ -5,7 +5,8 @@ from discriminator import Discriminator
 from generator import Generator
 
 class CycleGAN:
-  def __init__(self, lambda1=10, lambda2=10, use_lsgan=True):
+  def __init__(self, batch_size=1, fake_buffer_size=50,
+    image_size=128, use_lsgan=True, lambda1=10, lambda2=10):
     """
     Args:
       lambda1: integer, forward cycle loss weight
@@ -22,17 +23,33 @@ class CycleGAN:
     self.F = Generator('F')
     self.D_X = Discriminator('D_X', use_sigmoid=use_sigmoid)
 
-  def discriminator_loss(self, G, D, x, y, use_lsgan=True):
+    # buffer that stores generated images
+    self.fake_buffer_G = tf.get_variable('fake_buffer_G',
+        shape=[fake_buffer_size, image_size, image_size, 3],
+        initializer=tf.constant_initializer(0.0),
+        trainable=False)
+    self.fake_buffer_F = tf.get_variable('fake_buffer_F',
+        shape=[fake_buffer_size, image_size, image_size, 3],
+        initializer=tf.constant_initializer(0.0),
+        trainable=False)
+
+  def update_fake_buffer(self, x, y):
+    """ Keep image buffers that store the newest generated images
+    """
+    self.fake_buffer_G = tf.concat([self.fake_buffer_G[1:,:,:,:], self.G(x)], axis=0)
+    self.fake_buffer_F = tf.concat([self.fake_buffer_F[1:,:,:,:], self.F(y)], axis=0)
+
+  def discriminator_loss(self, G, D, fake_buffer, x, y, use_lsgan=True):
     """ note: D(y).shape == (batch_size,8,8,1)
     """
     if use_lsgan:
       # use mean squared error
       error_real = tf.reduce_mean(tf.squared_difference(D(y),1))
-      error_fake = tf.reduce_mean(tf.square(D(G(x))))
+      error_fake = tf.reduce_mean(tf.square(D(fake_buffer)))
     else:
       # use cross entropy
       error_real = -tf.reduce_mean(ops.safe_log(D(y)))
-      error_fake = -tf.reduce_mean(ops.safe_log(1-D(G(x))))
+      error_fake = -tf.reduce_mean(ops.safe_log(1-D(fake_buffer)))
     loss = (error_real + error_fake) / 2
     return loss
 
@@ -56,12 +73,13 @@ class CycleGAN:
     return loss
 
   def model(self, x, y):
+    self.update_fake_buffer(x, y)
     cycle_loss = self.cycle_consistency_loss(self.G, self.F, x, y)
 
     # X -> Y
     G_gan_loss = self.generator_loss(self.G, self.D_Y, x, use_lsgan=self.use_lsgan)
     G_loss =  G_gan_loss + cycle_loss
-    D_Y_loss = self.discriminator_loss(self.G, self.D_Y, x, y, use_lsgan=self.use_lsgan)
+    D_Y_loss = self.discriminator_loss(self.G, self.D_Y, self.fake_buffer_G,  x, y, use_lsgan=self.use_lsgan)
 
     tf.summary.histogram('D_Y/true', self.D_Y(y))
     tf.summary.histogram('D_Y/fake', self.D_Y(self.G(x)))
@@ -69,7 +87,7 @@ class CycleGAN:
     # Y -> X
     F_gan_loss = self.generator_loss(self.F, self.D_X, y, use_lsgan=self.use_lsgan)
     F_loss = F_gan_loss + cycle_loss
-    D_X_loss = self.discriminator_loss(self.F, self.D_X, y, x, use_lsgan=self.use_lsgan)
+    D_X_loss = self.discriminator_loss(self.F, self.D_X, self.fake_buffer_F, y, x, use_lsgan=self.use_lsgan)
 
     # summary
     tf.summary.histogram('D_X/true', self.D_X(x))

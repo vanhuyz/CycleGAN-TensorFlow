@@ -8,6 +8,7 @@ X_TRAIN_FILE = 'data/tfrecords/apple.tfrecords'
 Y_TRAIN_FILE = 'data/tfrecords/orange.tfrecords'
 
 BATCH_SIZE = 1
+FAKE_BUFFER_SIZE = 50
 
 def train():
   current_time = datetime.now().strftime("%Y%m%d-%H%M")
@@ -15,11 +16,12 @@ def train():
   os.makedirs(checkpoints_dir, exist_ok=True)
 
   graph = tf.Graph()
-  cycle_gan = CycleGAN(use_lsgan=True)
 
   with graph.as_default():
+    cycle_gan = CycleGAN(use_lsgan=True)
+
     X_reader = Reader(X_TRAIN_FILE, batch_size=BATCH_SIZE, name='X')
-    Y_reader = Reader(Y_TRAIN_FILE, batch_size=BATCH_SIZE, name='Y')
+    Y_reader = Reader(Y_TRAIN_FILE, batch_size=FAKE_BUFFER_SIZE, name='Y')
 
     x = X_reader.feed()
     y = Y_reader.feed()

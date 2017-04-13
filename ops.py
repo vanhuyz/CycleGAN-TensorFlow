@@ -16,9 +16,9 @@ def c7s1_k(input, k, reuse=False, is_training=True, name=None):
     biases = tf.get_variable("biases", [k],
         initializer=tf.constant_initializer(0.0))
 
-    # TODO: reflection padding
-    conv = tf.nn.conv2d(input, weights,
-        strides=[1, 1, 1, 1], padding='SAME')
+    padded = tf.pad(input, [[0,0],[3,3],[3,3],[0,0]], 'REFLECT')
+    conv = tf.nn.conv2d(padded, weights,
+        strides=[1, 1, 1, 1], padding='VALID')
     bn = _batch_norm(conv+biases, is_training)
     output = tf.nn.relu(bn)
     return output
@@ -55,8 +55,9 @@ def Rk(input, k, reuse=False, name=None):
       shape=[3, 3, input.get_shape()[3], k])
     biases1 = tf.get_variable("biases1", [k],
         initializer=tf.constant_initializer(0.0))
-    conv1 = tf.nn.conv2d(input, weights1,
-        strides=[1, 1, 1, 1], padding='SAME')
+    padded1 = tf.pad(input, [[0,0],[2,2],[2,2],[0,0]], 'REFLECT')
+    conv1 = tf.nn.conv2d(padded1, weights1,
+        strides=[1, 1, 1, 1], padding='VALID')
     relu1 = tf.nn.relu(conv1+biases1)
 
     # layer 2
@@ -64,10 +65,12 @@ def Rk(input, k, reuse=False, name=None):
       shape=[3, 3, relu1.get_shape()[3], k])
     biases2 = tf.get_variable("biases2", [k],
         initializer=tf.constant_initializer(0.0))
-    conv2 = tf.nn.conv2d(relu1, weights1,
-        strides=[1, 1, 1, 1], padding='SAME')
+    padded2 = tf.pad(relu1, [[0,0],[2,2],[2,2],[0,0]], 'REFLECT')
+    conv2 = tf.nn.conv2d(padded2, weights1,
+        strides=[1, 1, 1, 1], padding='VALID')
     res = conv2+biases2
-    relu2 = tf.nn.relu(input+res)
+    shaved = res[:,2:-2,2:-2,:]
+    relu2 = tf.nn.relu(input+shaved)
     return relu2
 
 def uk(input, k, reuse=False, is_training=True, name=None):
@@ -114,6 +117,7 @@ def Ck(input, k, slope=0.2, stride=2, reuse=False, use_batchnorm=True, is_traini
       shape=[4, 4, input.get_shape()[3], k])
     biases = tf.get_variable("biases", [k],
         initializer=tf.constant_initializer(0.0))
+
     conv = tf.nn.conv2d(input, weights,
         strides=[1, stride, stride, 1], padding='SAME')
     h = conv+biases
@@ -131,6 +135,7 @@ def last_conv(input, reuse=False, use_sigmoid=False, name=None):
       shape=[4, 4, input.get_shape()[3], 1])
     biases = tf.get_variable("biases", [1],
         initializer=tf.constant_initializer(0.0))
+
     conv = tf.nn.conv2d(input, weights,
         strides=[1, 1, 1, 1], padding='SAME')
     output = conv + biases

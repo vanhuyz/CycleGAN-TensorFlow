@@ -81,10 +81,10 @@ class CycleGAN:
     tf.summary.scalar('loss/D_X', D_X_loss)
     tf.summary.scalar('loss/cycle', cycle_loss)
 
-    tf.summary.image('X/generated', utils.convert2int(self.G(x)))
-    tf.summary.image('X/reconstruction', utils.convert2int(self.F(self.G(x))))
-    tf.summary.image('Y/generated', utils.convert2int(self.F(y)))
-    tf.summary.image('Y/reconstruction', utils.convert2int(self.G(self.F(y))))
+    tf.summary.image('X/generated', utils.batch_convert2int(self.G(x)))
+    tf.summary.image('X/reconstruction', utils.batch_convert2int(self.F(self.G(x))))
+    tf.summary.image('Y/generated', utils.batch_convert2int(self.F(y)))
+    tf.summary.image('Y/reconstruction', utils.batch_convert2int(self.G(self.F(y))))
 
     summary_op = tf.summary.merge_all()
 

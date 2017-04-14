@@ -1,7 +1,8 @@
 import tensorflow as tf
 
 ## Layers
-def c7s1_k(input, k, reuse=False, is_training=True, name=None):
+### Generator layers
+def c7s1_k(input, k, reuse=False, batch_norm=True, activation='relu', is_training=True, name=None):
   """ A 7x7 Convolution-BatchNorm-ReLU layer with k filters and stride 1
   Args:
     input: 4D tensor
@@ -19,8 +20,16 @@ def c7s1_k(input, k, reuse=False, is_training=True, name=None):
     padded = tf.pad(input, [[0,0],[3,3],[3,3],[0,0]], 'REFLECT')
     conv = tf.nn.conv2d(padded, weights,
         strides=[1, 1, 1, 1], padding='VALID')
-    bn = _batch_norm(conv+biases, is_training)
-    output = tf.nn.relu(bn)
+
+    if batch_norm == True:
+      output = _batch_norm(conv+biases, is_training)
+    else:
+      output = conv+biases
+
+    if activation == 'relu':
+      output = tf.nn.relu(output)
+    if activation == 'tanh':
+      output = tf.nn.tanh(output)
     return output
 
 def dk(input, k, reuse=False, is_training=True, name=None):
@@ -98,6 +107,7 @@ def uk(input, k, reuse=False, is_training=True, name=None):
     output = tf.nn.relu(bn)
     return output
 
+### Discriminator layers
 def Ck(input, k, slope=0.2, stride=2, reuse=False, use_batchnorm=True, is_training=True, name=None):
   """ A 4x4 Convolution-BatchNorm-LeakyReLU layer with k filters and stride 2
   Args:

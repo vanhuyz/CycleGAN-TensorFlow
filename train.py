@@ -26,7 +26,9 @@ def train():
     y = Y_reader.feed()
 
     G_loss, D_Y_loss, F_loss, D_X_loss, summary_op = cycle_gan.model(x, y)
-    optimizer = cycle_gan.optimize(G_loss, D_Y_loss, F_loss, D_X_loss)
+    G_optimizer, D_Y_optimizer, F_optimizer, D_X_optimizer = (
+        cycle_gan.optimize(G_loss, D_Y_loss, F_loss, D_X_loss)
+    )
 
     saver = tf.train.Saver()
 
@@ -41,8 +43,16 @@ def train():
     try:
       step = 0
       while not coord.should_stop():
-        _, G_loss_val, D_Y_loss_val, F_loss_val, D_X_loss_val, summary = \
-            sess.run([optimizer, G_loss, D_Y_loss, F_loss, D_X_loss, summary_op])
+        # try to update discriminators after updating generators twice
+        if step % 2 == 0:
+          _, _, G_loss_val, D_Y_loss_val, F_loss_val, D_X_loss_val, summary = (
+              sess.run([G_optimizer, F_optimizer, G_loss, D_Y_loss, F_loss, D_X_loss, summary_op])
+          )
+        else:
+          _, _, _, _, G_loss_val, D_Y_loss_val, F_loss_val, D_X_loss_val, summary = (
+              sess.run([G_optimizer, D_Y_optimizer, F_optimizer, D_X_optimizer,
+                        G_loss, D_Y_loss, F_loss, D_X_loss, summary_op])
+          )
 
         train_writer.add_summary(summary, step)
         train_writer.flush()
@@ -71,6 +81,7 @@ def train():
       # When done, ask the threads to stop.
       coord.request_stop()
       coord.join(threads)
+
 
 if __name__ == '__main__':
   train()

@@ -131,9 +131,9 @@ class CycleGAN:
 
       learning_rate = tf.where(tf.greater(global_step, without_decay_steps),
           starter_learning_rate,
-          tf.train.polynomial_decay(starter_learning_rate, global_step,
-                                        decay_steps, end_learning_rate,
-                                        power=1.0))
+          tf.train.polynomial_decay(learning_rate, global_step,
+                                    decay_steps, end_learning_rate,
+                                    power=1.0))
 
       learning_step = (
           tf.train.AdamOptimizer(learning_rate, name=name)
@@ -146,5 +146,7 @@ class CycleGAN:
     F_optimizer =  make_optimizer(F_loss, self.F.variables, name='Adam_F')
     D_X_optimizer = make_optimizer(D_X_loss, self.D_X.variables, name='Adam_D_X')
 
-    with tf.control_dependencies([G_optimizer, D_Y_optimizer, F_optimizer, D_X_optimizer]):
-      return tf.no_op(name='train')
+    # with tf.control_dependencies([G_optimizer, D_Y_optimizer, F_optimizer, D_X_optimizer]):
+    #   return tf.no_op(name='train')
+
+    return G_optimizer, D_Y_optimizer, F_optimizer, D_X_optimizer

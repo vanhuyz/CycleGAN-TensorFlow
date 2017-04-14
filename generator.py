@@ -32,11 +32,11 @@ class Generator:
       u32 = ops.uk(u64, 32, reuse=self.reuse, name='u32')               # (?, 128, 128, 32)
 
       # convolution
-      c7s1_3 = ops.c7s1_k(u32, 3, reuse=self.reuse, name='c7s1_3')      # (?, 128, 128, 3)
-      output = tf.tanh(c7s1_3, name='output')
+      output = ops.c7s1_k(u32, 3,batch_norm=False,
+          activation='tanh', reuse=self.reuse, name='output')           # (?, 128, 128, 3)
 
     # set reuse=True for next call
     self.reuse = True
     self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
-    # print(self.variables)
+
     return output

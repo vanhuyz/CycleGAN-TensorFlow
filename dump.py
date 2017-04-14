@@ -81,7 +81,7 @@ def data_writer(input_dir, file_name=None):
 
     if i % 500 == 0:
       print("Processed {}/{}.".format(i, images_num))
-
+  print("Done.")
   writer.close()
 
 if __name__ == '__main__':

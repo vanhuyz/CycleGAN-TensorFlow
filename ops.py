@@ -1,6 +1,7 @@
 import tensorflow as tf
 
 ## Layers
+### Generator layers
 def c7s1_k(input, k, reuse=False, batch_norm=True, activation='relu', is_training=True, name=None):
   """ A 7x7 Convolution-BatchNorm-ReLU layer with k filters and stride 1
   Args:
@@ -106,6 +107,7 @@ def uk(input, k, reuse=False, is_training=True, name=None):
     output = tf.nn.relu(bn)
     return output
 
+### Discriminator layers
 def Ck(input, k, slope=0.2, stride=2, reuse=False, use_batchnorm=True, is_training=True, name=None):
   """ A 4x4 Convolution-BatchNorm-LeakyReLU layer with k filters and stride 2
   Args:

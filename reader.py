@@ -3,7 +3,7 @@ import utils
 
 class Reader():
   def __init__(self, tfrecords_file, image_size=128,
-    min_queue_examples=1000, batch_size=32, num_threads=8, name=''):
+    min_queue_examples=1000, batch_size=1, num_threads=8, name=''):
     """
     Args:
       tfrecords_file: string, tfrecords file path

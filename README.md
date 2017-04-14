@@ -33,7 +33,7 @@ Check TensorBoard to see training progress and generated images.
 $ tensorboard --logdir checkpoints/${datetime}
 ```
 
-[train image](samples/train.png)
+![train image](samples/train.png)
 
 
 ## TODO:

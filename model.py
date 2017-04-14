@@ -31,30 +31,30 @@ class CycleGAN:
     self.F = Generator('F', self.is_training)
     self.D_X = Discriminator('D_X', self.is_training, use_sigmoid=use_sigmoid)
 
+  def model(self):
     X_reader = Reader(X_TRAIN_FILE, name='X')
     Y_reader = Reader(Y_TRAIN_FILE, name='Y')
 
-    self.x = X_reader.feed()
-    self.y = Y_reader.feed()
+    x = X_reader.feed()
+    y = Y_reader.feed()
 
-  def model(self):
-    cycle_loss = self.cycle_consistency_loss(self.G, self.F, self.x, self.y)
+    cycle_loss = self.cycle_consistency_loss(self.G, self.F, x, y)
 
     # X -> Y
-    G_gan_loss = self.generator_loss(self.G, self.D_Y, self.x, use_lsgan=self.use_lsgan)
+    G_gan_loss = self.generator_loss(self.G, self.D_Y, x, use_lsgan=self.use_lsgan)
     G_loss =  G_gan_loss + cycle_loss
-    D_Y_loss = self.discriminator_loss(self.G, self.D_Y, self.x, self.y, use_lsgan=self.use_lsgan)
+    D_Y_loss = self.discriminator_loss(self.G, self.D_Y, x, y, use_lsgan=self.use_lsgan)
 
     # Y -> X
-    F_gan_loss = self.generator_loss(self.F, self.D_X, self.y, use_lsgan=self.use_lsgan)
+    F_gan_loss = self.generator_loss(self.F, self.D_X, y, use_lsgan=self.use_lsgan)
     F_loss = F_gan_loss + cycle_loss
-    D_X_loss = self.discriminator_loss(self.F, self.D_X, self.y, self.x, use_lsgan=self.use_lsgan)
+    D_X_loss = self.discriminator_loss(self.F, self.D_X, y, x, use_lsgan=self.use_lsgan)
 
     # summary
-    tf.summary.histogram('D_Y/true', self.D_Y(self.y))
-    tf.summary.histogram('D_Y/fake', self.D_Y(self.G(self.x)))
-    tf.summary.histogram('D_X/true', self.D_X(self.x))
-    tf.summary.histogram('D_X/fake', self.D_X(self.F(self.y)))
+    tf.summary.histogram('D_Y/true', self.D_Y(y))
+    tf.summary.histogram('D_Y/fake', self.D_Y(self.G(x)))
+    tf.summary.histogram('D_X/true', self.D_X(x))
+    tf.summary.histogram('D_X/fake', self.D_X(self.F(y)))
 
     tf.summary.scalar('loss/G', G_gan_loss)
     tf.summary.scalar('loss/D_Y', D_Y_loss)
@@ -62,10 +62,10 @@ class CycleGAN:
     tf.summary.scalar('loss/D_X', D_X_loss)
     tf.summary.scalar('loss/cycle', cycle_loss)
 
-    tf.summary.image('X/generated', utils.batch_convert2int(self.G(self.x)))
-    tf.summary.image('X/reconstruction', utils.batch_convert2int(self.F(self.G(self.x))))
-    tf.summary.image('Y/generated', utils.batch_convert2int(self.F(self.y)))
-    tf.summary.image('Y/reconstruction', utils.batch_convert2int(self.G(self.F(self.y))))
+    tf.summary.image('X/generated', utils.batch_convert2int(self.G(x)))
+    tf.summary.image('X/reconstruction', utils.batch_convert2int(self.F(self.G(x))))
+    tf.summary.image('Y/generated', utils.batch_convert2int(self.F(y)))
+    tf.summary.image('Y/reconstruction', utils.batch_convert2int(self.G(self.F(y))))
 
     self.summary = tf.summary.merge_all()
     self.saver = tf.train.Saver()

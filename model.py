@@ -126,14 +126,20 @@ class CycleGAN:
       global_step = tf.Variable(0, trainable=False)
       starter_learning_rate = 2e-4
       end_learning_rate = 0.0
-      without_decay_steps = 100000
-      decay_steps = 100000
+      # without_decay_steps = 100000
+      decay_steps = 200000
 
-      learning_rate = tf.where(tf.greater(global_step, without_decay_steps),
-          starter_learning_rate,
-          tf.train.polynomial_decay(learning_rate, global_step,
+      # learning_rate = tf.where(tf.greater(global_step, without_decay_steps),
+      #     starter_learning_rate,
+      #     tf.train.polynomial_decay(starter_learning_rate, global_step,
+      #                               decay_steps, end_learning_rate,
+      #                               power=1.0))
+
+      learning_rate = (
+          tf.train.polynomial_decay(starter_learning_rate, global_step,
                                     decay_steps, end_learning_rate,
-                                    power=1.0))
+                                    power=1.0)
+      )
 
       learning_step = (
           tf.train.AdamOptimizer(learning_rate, name=name)

@@ -34,8 +34,11 @@ Check TensorBoard to see training progress and generated images.
 $ tensorboard --logdir checkpoints/${datetime}
 ```
 
-![train image](samples/train.png)
+* apple -> orange
+![apple2orange](samples/apple2orange.png)
 
+* orange -> apple
+![orang2apple](samples/orange2apple.png)
 
 ## TODO:
 

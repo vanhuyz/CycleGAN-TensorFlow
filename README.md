@@ -39,6 +39,5 @@ $ tensorboard --logdir checkpoints/${datetime}
 
 ## TODO:
 
-* PatchGAN for discriminators
 * Instance normalization
 * Update discriminators using a history of generated images

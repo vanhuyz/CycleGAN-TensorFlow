@@ -35,11 +35,13 @@ $ tensorboard --logdir checkpoints/${datetime}
 ```
 
 * apple -> orange
+
 :-------------------------:|:-------------------------:
 ![apple2orange](samples/apple2orange_1.png) | ![apple2orange](samples/apple2orange_2.png)
 
 
 * orange -> apple
+
 :-------------------------:|:-------------------------:
 ![orang2apple](samples/orange2apple_1.png) | ![orang2apple](samples/orange2apple_2.png)
 

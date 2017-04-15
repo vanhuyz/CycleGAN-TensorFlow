@@ -92,14 +92,15 @@ def uk(input, k, reuse=False, is_training=True, name=None):
     4D tensor
   """
   with tf.variable_scope(name, reuse=reuse):
+    input_shape = input.get_shape().as_list()
+
     weights = _weights("weights",
-      shape=[3, 3, k, input.get_shape()[3]])
+      shape=[3, 3, k, input_shape[3]])
     biases = tf.get_variable("biases", [k],
         initializer=tf.constant_initializer(0.0))
 
-    input_shape = input.get_shape()
-    output_size = (int)((int)(input_shape[1])*2)
-    output_shape = [(int)(input_shape[0]), output_size, output_size, k]
+    output_size = input_shape[1]*2
+    output_shape = [input_shape[0], output_size, output_size, k]
     fsconv = tf.nn.conv2d_transpose(input, weights,
         output_shape=output_shape,
         strides=[1, 2, 2, 1], padding='SAME')

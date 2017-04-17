@@ -5,24 +5,34 @@ from reader import Reader
 from discriminator import Discriminator
 from generator import Generator
 
-X_TRAIN_FILE = 'data/tfrecords/apple.tfrecords'
-Y_TRAIN_FILE = 'data/tfrecords/orange.tfrecords'
 REAL_LABEL = 0.9
 
 class CycleGAN:
-  def __init__(self, batch_size=1,
-    image_size=128, use_lsgan=True,
-    lambda1=10, lambda2=10):
+  def __init__(self,
+               X_train_file,
+               Y_train_file,
+               batch_size,
+               image_size,
+               use_lsgan,
+               lambda1,
+               lambda2,
+               learning_rate,
+               beta1
+              ):
     """
     Args:
-      lambda1: integer, forward cycle loss weight
-      lambda2: integer, backward cycle loss weight
+      lambda1: integer, weight for forward cycle loss (X->Y->X)
+      lambda2: integer, weight for backward cycle loss (Y->X->Y)
       use_lsgan: boolean
     """
     self.lambda1 = lambda1
     self.lambda2 = lambda2
     self.use_lsgan = use_lsgan
     use_sigmoid = not use_lsgan
+    self.learning_rate = learning_rate
+    self.beta1 = beta1
+    self.X_train_file = X_train_file
+    self.Y_train_file = Y_train_file
 
     self.is_training = tf.placeholder_with_default(True, shape=[], name='is_training')
 
@@ -32,8 +42,8 @@ class CycleGAN:
     self.D_X = Discriminator('D_X', self.is_training, use_sigmoid=use_sigmoid)
 
   def model(self):
-    X_reader = Reader(X_TRAIN_FILE, name='X')
-    Y_reader = Reader(Y_TRAIN_FILE, name='Y')
+    X_reader = Reader(self.X_train_file, name='X')
+    Y_reader = Reader(self.Y_train_file, name='Y')
 
     x = X_reader.feed()
     y = Y_reader.feed()
@@ -80,10 +90,10 @@ class CycleGAN:
                 so here is AdamOptimizer with starter learning rate 0.0002
       """
       global_step = tf.Variable(0, trainable=False)
-      starter_learning_rate = 2e-4
+      starter_learning_rate = self.learning_rate
       # end_learning_rate = 0.0
       # decay_steps = 200000
-      beta1 = 0.5
+      beta1 = self.beta1
       # learning_rate = (
       #     tf.train.polynomial_decay(starter_learning_rate, global_step,
       #                               decay_steps, end_learning_rate,
@@ -105,8 +115,8 @@ class CycleGAN:
       return tf.no_op(name='optimizers')
 
   def discriminator_loss(self, G, D, x, y, use_lsgan=True):
-    """ Note: D(y).shape == (batch_size,8,8,1),
-              default: fake_buffer_size=50, batch_size=1
+    """ Note: default: D(y).shape == (batch_size,5,5,1),
+                       fake_buffer_size=50, batch_size=1
     Args:
       G: generator object
       D: discriminator object

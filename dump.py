@@ -2,6 +2,18 @@ import tensorflow as tf
 import os
 import random
 
+FLAGS = tf.flags.FLAGS
+
+tf.flags.DEFINE_string('X_input_dir', 'data/apple2orange/trainA',
+                       'X input directory, default: data/apple2orange/trainA')
+tf.flags.DEFINE_string('Y_input_dir', 'data/apple2orange/trainB',
+                       'Y input directory, default: data/apple2orange/trainB')
+tf.flags.DEFINE_string('X_output_file', 'data/tfrecords/apple.tfrecords',
+                       'X output tfrecords file, default: data/tfrecords/apple.tfrecords')
+tf.flags.DEFINE_string('Y_output_file', 'data/tfrecords/orange.tfrecords',
+                       'Y output tfrecords file, default: data/tfrecords/orange.tfrecords')
+
+
 def data_reader(input_dir, shuffle=True):
   """Read images from input_dir then shuffle them
   Args:
@@ -56,24 +68,24 @@ def _convert_to_example(file_path, image_buffer):
     }))
   return example
 
-def data_writer(input_dir, file_name=None):
+def data_writer(input_dir, output_file):
   """Write data to tfrecords
   """
   file_paths = data_reader(input_dir)
-  if file_name == None:
-    file_name = input_dir.split('/')[-1]
 
-  tfrecords_dir = 'data/tfrecords/'
-  os.makedirs(tfrecords_dir, exist_ok=True)
+  # create tfrecords dir if not exists
+  output_dir = os.path.dirname(output_file)
+  os.makedirs(output_dir, exist_ok=True)
 
   images_num = len(file_paths)
 
-  writer = tf.python_io.TFRecordWriter(tfrecords_dir + '{}.tfrecords'.format(file_name))
+  # dump to tfrecords file
+  writer = tf.python_io.TFRecordWriter(output_file)
 
   for i in range(len(file_paths)):
     file_path = file_paths[i]
 
-    with tf.gfile.FastGFile(file_path, 'r') as f:
+    with tf.gfile.FastGFile(file_path, 'rb') as f:
       image_data = f.read()
 
     example = _convert_to_example(file_path, image_data)
@@ -84,10 +96,11 @@ def data_writer(input_dir, file_name=None):
   print("Done.")
   writer.close()
 
+def main(unused_argv):
+  print("Dump X data...")
+  data_writer(X_INPUT_DIR, X_OUTPUT_FILE)
+  print("Dump Y data...")
+  data_writer(Y_INPUT_DIR, Y_OUTPUT_FILE)
+
 if __name__ == '__main__':
-  print("Dump apple data...")
-  input_dir = 'data/apple2orange/trainA'
-  data_writer(input_dir, 'apple')
-  print("Dump orange data...")
-  input_dir = 'data/apple2orange/trainB'
-  data_writer(input_dir, 'orange')
+  tf.app.run()

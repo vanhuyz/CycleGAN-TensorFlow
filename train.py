@@ -67,7 +67,7 @@ def train():
         # update previously generated images
         fake_y_val, fake_x_val = sess.run([fake_y, fake_x])
         G_fake_buffer = np.concatenate((G_fake_buffer[1:,:,:,:], fake_y_val), axis=0)
-        F_fake_buffer = np.concatenate((F_fake_buffer[1:,:,:,:], fake_y_val), axis=0)
+        F_fake_buffer = np.concatenate((F_fake_buffer[1:,:,:,:], fake_x_val), axis=0)
 
         _, G_loss_val, D_Y_loss_val, F_loss_val, D_X_loss_val, summary = (
               sess.run(

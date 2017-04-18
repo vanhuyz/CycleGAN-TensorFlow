@@ -22,7 +22,7 @@ def sample():
 
     cycle_gan = CycleGAN()
     cycle_gan.model()
-    out_image = cycle_gan.sample(tf.expand_dims(in_image, 0))
+    out_image = cycle_gan.G.sample(tf.expand_dims(in_image, 0))
 
   with tf.Session(graph=graph) as sess:
     sess.run(tf.global_variables_initializer())

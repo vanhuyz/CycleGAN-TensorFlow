@@ -45,15 +45,16 @@ class CycleGAN:
     self.is_training = tf.placeholder_with_default(True, shape=[], name='is_training')
 
     self.G = Generator('G', self.is_training)
-    self.D_Y = Discriminator('D_Y', self.is_training, use_sigmoid=use_sigmoid)
+    self.D_Y = Discriminator('D_Y',
+        self.is_training, use_sigmoid=use_sigmoid)
     self.F = Generator('F', self.is_training)
-    self.D_X = Discriminator('D_X', self.is_training, use_sigmoid=use_sigmoid)
+    self.D_X = Discriminator('D_X',
+        self.is_training, use_sigmoid=use_sigmoid)
 
     self.G_fake_buffer = tf.placeholder(tf.float32,
         shape=[fake_buffer_size, image_size, image_size, 3])
     self.F_fake_buffer = tf.placeholder(tf.float32,
         shape=[fake_buffer_size, image_size, image_size, 3])
-
 
   def model(self):
     X_reader = Reader(self.X_train_file, name='X')

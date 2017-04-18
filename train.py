@@ -4,6 +4,7 @@ from reader import Reader
 from datetime import datetime
 import os
 import logging
+from utils import ImagePool
 
 FLAGS = tf.flags.FLAGS
 
@@ -19,6 +20,8 @@ tf.flags.DEFINE_float('learning_rate', 2e-4,
                       'initial learning rate for Adam, default: 0.0002')
 tf.flags.DEFINE_float('beta1', 0.5,
                       'momentum term of Adam, default: 0.5')
+tf.flags.DEFINE_float('pool_size', 50,
+                      'size of image buffer that stores previously generated images, default: 50')
 
 tf.flags.DEFINE_string('X_train_file', 'data/tfrecords/apple.tfrecords',
                        'X tfrecords file for training, default: data/tfrecords/apple.tfrecords')
@@ -34,17 +37,17 @@ def train():
   graph = tf.Graph()
   with graph.as_default():
     cycle_gan = CycleGAN(
+        X_train_file=FLAGS.X_train_file,
+        Y_train_file=FLAGS.Y_train_file,
         batch_size=FLAGS.batch_size,
         image_size=FLAGS.image_size,
         use_lsgan=FLAGS.use_lsgan,
         lambda1=FLAGS.lambda1,
         lambda2=FLAGS.lambda1,
         learning_rate=FLAGS.learning_rate,
-        beta1=FLAGS.beta1,
-        X_train_file=FLAGS.X_train_file,
-        Y_train_file=FLAGS.Y_train_file
+        beta1=FLAGS.beta1
     )
-    G_loss, D_Y_loss, F_loss, D_X_loss = cycle_gan.model()
+    G_loss, D_Y_loss, F_loss, D_X_loss, fake_y, fake_x = cycle_gan.model()
     optimizers = cycle_gan.optimize(G_loss, D_Y_loss, F_loss, D_X_loss)
     train_writer = tf.summary.FileWriter(checkpoints_dir, graph)
 
@@ -54,12 +57,21 @@ def train():
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
+
     try:
       step = 0
       while not coord.should_stop():
+        # update previously generated images
+        fake_y_val, fake_x_val = sess.run([fake_y, fake_x])
+        fake_Y_pool = ImagePool(FLAGS.pool_size)
+        fake_X_pool = ImagePool(FLAGS.pool_size)
+
+        # train
         _, G_loss_val, D_Y_loss_val, F_loss_val, D_X_loss_val, summary = (
               sess.run(
-                  [optimizers, G_loss, D_Y_loss, F_loss, D_X_loss, cycle_gan.summary]
+                  [optimizers, G_loss, D_Y_loss, F_loss, D_X_loss, cycle_gan.summary],
+                  feed_dict={cycle_gan.fake_y: fake_Y_pool.query(fake_y_val),
+                             cycle_gan.fake_x: fake_X_pool.query(fake_x_val)}
               )
         )
 
@@ -73,7 +85,7 @@ def train():
           logging.info('  F_loss   : {}'.format(F_loss_val))
           logging.info('  D_X_loss : {}'.format(D_X_loss_val))
 
-        if step % 1000 == 0:
+        if step % 10000 == 0:
           save_path = cycle_gan.saver.save(sess, checkpoints_dir + "/model.ckpt", global_step=step)
           logging.info("Model saved in file: %s" % save_path)
 

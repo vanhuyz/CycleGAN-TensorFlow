@@ -1,17 +1,12 @@
 import tensorflow as tf
 import ops
+import utils
 
 class Generator:
   def __init__(self, name, is_training, fake_buffer_size=50, image_size=128):
     self.name = name
     self.reuse = False
     self.is_training = is_training
-
-    # TODO: store the newest generated images
-    # self.buffer = tf.get_variable('fake_buffer_' + name,
-    #     shape=[fake_buffer_size, image_size, image_size, 3],
-    #     initializer=tf.constant_initializer(0.0),
-    #     trainable=False)
 
   def __call__(self, input):
     """
@@ -54,4 +49,7 @@ class Generator:
 
     return output
 
-
+  def sample(self, input):
+    image = utils.batch_convert2int(self.__call__(input))
+    image = tf.image.encode_jpeg(tf.squeeze(image, [0]))
+    return image

@@ -62,6 +62,9 @@ optional arguments:
   --learning_rate LEARNING_RATE
                         initial learning rate for Adam, default: 0.0002
   --beta1 BETA1         momentum term of Adam, default: 0.5
+  --pool_size POOL_SIZE
+                        size of image buffer that stores previously generated
+                        images, default: 50
   --X_train_file X_TRAIN_FILE
                         X tfrecords file for training,
                         default: data/tfrecords/apple.tfrecords

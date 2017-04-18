@@ -17,8 +17,7 @@ class CycleGAN:
                lambda1,
                lambda2,
                learning_rate,
-               beta1,
-               fake_buffer_size
+               beta1
               ):
     """
     Args:
@@ -31,7 +30,6 @@ class CycleGAN:
       use_lsgan: boolean
       learning_rate: float, initial learning rate for Adam
       beta1: float, momentum term of Adam
-      fake_buffer_size: integer, size of image buffer that stores previously generated images
     """
     self.lambda1 = lambda1
     self.lambda2 = lambda2
@@ -51,10 +49,10 @@ class CycleGAN:
     self.D_X = Discriminator('D_X',
         self.is_training, use_sigmoid=use_sigmoid)
 
-    self.G_fake_buffer = tf.placeholder(tf.float32,
-        shape=[fake_buffer_size, image_size, image_size, 3])
-    self.F_fake_buffer = tf.placeholder(tf.float32,
-        shape=[fake_buffer_size, image_size, image_size, 3])
+    self.fake_x = tf.placeholder(tf.float32,
+        shape=[batch_size, image_size, image_size, 3])
+    self.fake_y = tf.placeholder(tf.float32,
+        shape=[batch_size, image_size, image_size, 3])
 
   def model(self):
     X_reader = Reader(self.X_train_file, name='X')
@@ -69,13 +67,13 @@ class CycleGAN:
     fake_y = self.G(x)
     G_gan_loss = self.generator_loss(self.D_Y, fake_y, use_lsgan=self.use_lsgan)
     G_loss =  G_gan_loss + cycle_loss
-    D_Y_loss = self.discriminator_loss(self.D_Y, y, self.G_fake_buffer, use_lsgan=self.use_lsgan)
+    D_Y_loss = self.discriminator_loss(self.D_Y, y, self.fake_y, use_lsgan=self.use_lsgan)
 
     # Y -> X
     fake_x = self.F(y)
     F_gan_loss = self.generator_loss(self.D_X, fake_x, use_lsgan=self.use_lsgan)
     F_loss = F_gan_loss + cycle_loss
-    D_X_loss = self.discriminator_loss(self.D_X, x, self.F_fake_buffer, use_lsgan=self.use_lsgan)
+    D_X_loss = self.discriminator_loss(self.D_X, x, self.fake_x, use_lsgan=self.use_lsgan)
 
     # summary
     tf.summary.histogram('D_Y/true', self.D_Y(y))

@@ -96,4 +96,3 @@ Here is some screenshots from TensorBoard.
 ## TODO:
 
 * Instance normalization
-* Update discriminators using a history of generated images

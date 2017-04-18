@@ -80,13 +80,12 @@ def train():
         train_writer.add_summary(summary, step)
         train_writer.flush()
 
-        if step % 1 == 0:
+        if step % 100 == 0:
           logging.info('-----------Step %d:-------------' % step)
           logging.info('  G_loss   : {}'.format(G_loss_val))
           logging.info('  D_Y_loss : {}'.format(D_Y_loss_val))
           logging.info('  F_loss   : {}'.format(F_loss_val))
           logging.info('  D_X_loss : {}'.format(D_X_loss_val))
-          print(G_fake_buffer)
 
         if step % 10000 == 0:
           save_path = cycle_gan.saver.save(sess, checkpoints_dir + "/model.ckpt", global_step=step)

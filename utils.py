@@ -39,8 +39,7 @@ class ImagePool:
     self.images = []
 
   def query(self, image):
-    # return input if pool_size = 0 or batch_size > 1
-    if self.pool_size == 0 or image.shape[0] > 1:
+    if self.pool_size == 0:
       return image
 
     if len(self.images) < self.pool_size:

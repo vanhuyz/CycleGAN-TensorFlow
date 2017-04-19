@@ -14,6 +14,7 @@ class CycleGAN:
                batch_size,
                image_size,
                use_lsgan,
+               norm,
                lambda1,
                lambda2,
                learning_rate,
@@ -28,6 +29,7 @@ class CycleGAN:
       lambda1: integer, weight for forward cycle loss (X->Y->X)
       lambda2: integer, weight for backward cycle loss (Y->X->Y)
       use_lsgan: boolean
+      norm: 'instance' or 'batch'
       learning_rate: float, initial learning rate for Adam
       beta1: float, momentum term of Adam
     """
@@ -35,6 +37,8 @@ class CycleGAN:
     self.lambda2 = lambda2
     self.use_lsgan = use_lsgan
     use_sigmoid = not use_lsgan
+    self.batch_size = batch_size
+    self.image_size = image_size
     self.learning_rate = learning_rate
     self.beta1 = beta1
     self.X_train_file = X_train_file
@@ -42,12 +46,12 @@ class CycleGAN:
 
     self.is_training = tf.placeholder_with_default(True, shape=[], name='is_training')
 
-    self.G = Generator('G', self.is_training)
+    self.G = Generator('G', self.is_training, norm=norm)
     self.D_Y = Discriminator('D_Y',
-        self.is_training, use_sigmoid=use_sigmoid)
-    self.F = Generator('F', self.is_training)
+        self.is_training, norm=norm, use_sigmoid=use_sigmoid)
+    self.F = Generator('F', self.is_training, norm=norm)
     self.D_X = Discriminator('D_X',
-        self.is_training, use_sigmoid=use_sigmoid)
+        self.is_training, norm=norm, use_sigmoid=use_sigmoid)
 
     self.fake_x = tf.placeholder(tf.float32,
         shape=[batch_size, image_size, image_size, 3])
@@ -55,8 +59,10 @@ class CycleGAN:
         shape=[batch_size, image_size, image_size, 3])
 
   def model(self):
-    X_reader = Reader(self.X_train_file, name='X')
-    Y_reader = Reader(self.Y_train_file, name='Y')
+    X_reader = Reader(self.X_train_file, name='X',
+        image_size=self.image_size, batch_size=self.batch_size)
+    Y_reader = Reader(self.Y_train_file, name='Y',
+        image_size=self.image_size, batch_size=self.batch_size)
 
     x = X_reader.feed()
     y = Y_reader.feed()
@@ -92,31 +98,33 @@ class CycleGAN:
     tf.summary.image('Y/generated', utils.batch_convert2int(self.F(y)))
     tf.summary.image('Y/reconstruction', utils.batch_convert2int(self.G(self.F(y))))
 
-    self.summary = tf.summary.merge_all()
-    self.saver = tf.train.Saver()
-
     return G_loss, D_Y_loss, F_loss, D_X_loss, fake_y, fake_x
 
   def optimize(self, G_loss, D_Y_loss, F_loss, D_X_loss):
     def make_optimizer(loss, variables, name='Adam'):
       """ Adam optimizer with learning rate 0.0002 for the first 100k steps (~100 epochs)
           and a linearly decaying rate that goes to zero over the next 100k steps
-          Note: Not sure how to get learning rate at 100k-th step,
-                so here is AdamOptimizer with starter learning rate 0.0002
       """
       global_step = tf.Variable(0, trainable=False)
       starter_learning_rate = self.learning_rate
-      # end_learning_rate = 0.0
-      # decay_steps = 200000
+      end_learning_rate = 0.0
+      start_decay_step = 100000
+      decay_steps = 100000
       beta1 = self.beta1
-      # learning_rate = (
-      #     tf.train.polynomial_decay(starter_learning_rate, global_step,
-      #                               decay_steps, end_learning_rate,
-      #                               power=1.0)
-      # )
+      learning_rate = (
+          tf.where(
+                  tf.greater_equal(global_step, start_decay_step),
+                  tf.train.polynomial_decay(starter_learning_rate, global_step-start_decay_step,
+                                            decay_steps, end_learning_rate,
+                                            power=1.0),
+                  starter_learning_rate
+          )
+
+      )
+      tf.summary.scalar('learning_rate/{}'.format(name), learning_rate)
 
       learning_step = (
-          tf.train.AdamOptimizer(starter_learning_rate, beta1=beta1, name=name)
+          tf.train.AdamOptimizer(learning_rate, beta1=beta1, name=name)
                   .minimize(loss, global_step=global_step, var_list=variables)
       )
       return learning_step

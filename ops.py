@@ -1,42 +1,47 @@
 import tensorflow as tf
 
-## Layers
+## Layers: follow the naming convention used in the original paper
 ### Generator layers
-def c7s1_k(input, k, reuse=False, batch_norm=True, activation='relu', is_training=True, name=None):
+def c7s1_k(input, k, reuse=False, norm='instance', activation='relu', is_training=True, name='c7s1_k'):
   """ A 7x7 Convolution-BatchNorm-ReLU layer with k filters and stride 1
   Args:
     input: 4D tensor
     k: integer, number of filters (output depth)
+    norm: 'instance' or 'batch' or None
+    activation: 'relu' or 'tanh'
     name: string, e.g. 'c7sk-32'
+    is_training: boolean or BoolTensor
+    name: string
+    reuse: boolean
   Returns:
     4D tensor
   """
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[7, 7, input.get_shape()[3], k])
-    biases = tf.get_variable("biases", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases = _biases("biases", [k])
 
     padded = tf.pad(input, [[0,0],[3,3],[3,3],[0,0]], 'REFLECT')
     conv = tf.nn.conv2d(padded, weights,
         strides=[1, 1, 1, 1], padding='VALID')
 
-    if batch_norm == True:
-      output = _batch_norm(conv+biases, is_training)
-    else:
-      output = conv+biases
+    normalized = _norm(conv+biases, is_training, norm)
 
     if activation == 'relu':
-      output = tf.nn.relu(output)
+      output = tf.nn.relu(normalized)
     if activation == 'tanh':
-      output = tf.nn.tanh(output)
+      output = tf.nn.tanh(normalized)
     return output
 
-def dk(input, k, reuse=False, is_training=True, name=None):
+def dk(input, k, reuse=False, norm='instance', is_training=True, name=None):
   """ A 3x3 Convolution-BatchNorm-ReLU layer with k filters and stride 2
   Args:
     input: 4D tensor
     k: integer, number of filters (output depth)
+    norm: 'instance' or 'batch' or None
+    is_training: boolean or BoolTensor
+    name: string
+    reuse: boolean
     name: string, e.g. 'd64'
   Returns:
     4D tensor
@@ -44,25 +49,30 @@ def dk(input, k, reuse=False, is_training=True, name=None):
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[3, 3, input.get_shape()[3], k])
-    biases = tf.get_variable("biases", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases = _biases("biases", [k])
 
     conv = tf.nn.conv2d(input, weights,
         strides=[1, 2, 2, 1], padding='SAME')
-    bn = _batch_norm(conv+biases, is_training)
-    output = tf.nn.relu(bn)
+    normalized = _norm(conv+biases, is_training, norm)
+    output = tf.nn.relu(normalized)
     return output
 
 def Rk(input, k, reuse=False, name=None):
   """ A residual block that contains two 3x3 convolutional layers
       with the same number of filters on both layer
+  Args:
+    input: 4D Tensor
+    k: integer, number of filters (output depth)
+    reuse: boolean
+    name: string
+  Returns:
+    4D tensor (same shape as input)
   """
   with tf.variable_scope(name, reuse=reuse):
     # layer 1
     weights1 = _weights("weights1",
       shape=[3, 3, input.get_shape()[3], k])
-    biases1 = tf.get_variable("biases1", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases1 = _biases("biases1", [k])
     padded1 = tf.pad(input, [[0,0],[2,2],[2,2],[0,0]], 'REFLECT')
     conv1 = tf.nn.conv2d(padded1, weights1,
         strides=[1, 1, 1, 1], padding='VALID')
@@ -71,8 +81,8 @@ def Rk(input, k, reuse=False, name=None):
     # layer 2
     weights2 = _weights("weights2",
       shape=[3, 3, relu1.get_shape()[3], k])
-    biases2 = tf.get_variable("biases2", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases2 = _biases("biases2", [k])
+
     padded2 = tf.pad(relu1, [[0,0],[2,2],[2,2],[0,0]], 'REFLECT')
     conv2 = tf.nn.conv2d(padded2, weights1,
         strides=[1, 1, 1, 1], padding='VALID')
@@ -81,12 +91,15 @@ def Rk(input, k, reuse=False, name=None):
     relu2 = tf.nn.relu(input+shaved)
     return relu2
 
-def uk(input, k, reuse=False, is_training=True, name=None):
+def uk(input, k, reuse=False, norm='instance', is_training=True, name=None):
   """ A 3x3 fractional-strided-Convolution-BatchNorm-ReLU layer
       with k filters, stride 1/2
   Args:
     input: 4D tensor
     k: integer, number of filters (output depth)
+    norm: 'instance' or 'batch' or None
+    is_training: boolean or BoolTensor
+    reuse: boolean
     name: string, e.g. 'c7sk-32'
   Returns:
     4D tensor
@@ -96,27 +109,28 @@ def uk(input, k, reuse=False, is_training=True, name=None):
 
     weights = _weights("weights",
       shape=[3, 3, k, input_shape[3]])
-    biases = tf.get_variable("biases", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases = _biases("biases", [k])
 
     output_size = input_shape[1]*2
     output_shape = [input_shape[0], output_size, output_size, k]
     fsconv = tf.nn.conv2d_transpose(input, weights,
         output_shape=output_shape,
         strides=[1, 2, 2, 1], padding='SAME')
-    bn = _batch_norm(fsconv+biases, is_training)
-    output = tf.nn.relu(bn)
+    normalized = _norm(fsconv+biases, is_training, norm)
+    output = tf.nn.relu(normalized)
     return output
 
 ### Discriminator layers
-def Ck(input, k, slope=0.2, stride=2, reuse=False, use_batchnorm=True, is_training=True, name=None):
+def Ck(input, k, slope=0.2, stride=2, reuse=False, norm='instance', is_training=True, name=None):
   """ A 4x4 Convolution-BatchNorm-LeakyReLU layer with k filters and stride 2
   Args:
     input: 4D tensor
     k: integer, number of filters (output depth)
     slope: LeakyReLU's slope
     stride: integer
-    use_batchnorm: boolean
+    norm: 'instance' or 'batch' or None
+    is_training: boolean or BoolTensor
+    reuse: boolean
     name: string, e.g. 'C64'
   Returns:
     4D tensor
@@ -124,26 +138,28 @@ def Ck(input, k, slope=0.2, stride=2, reuse=False, use_batchnorm=True, is_traini
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[4, 4, input.get_shape()[3], k])
-    biases = tf.get_variable("biases", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases = _biases("biases", [k])
 
     conv = tf.nn.conv2d(input, weights,
         strides=[1, stride, stride, 1], padding='SAME')
-    h = conv+biases
-    if use_batchnorm:
-      h = _batch_norm(h, is_training)
-    output = _leaky_relu(h, slope)
+
+    normalized = _norm(conv+biases, is_training, norm)
+    output = _leaky_relu(normalized, slope)
     return output
 
 def last_conv(input, reuse=False, use_sigmoid=False, name=None):
   """ Last convolutional layer of discriminator network
       (1 filter with size 4x4, stride 1)
+  Args:
+    input: 4D tensor
+    reuse: boolean
+    use_sigmoid: boolean (False if use lsgan)
+    name: string, e.g. 'C64'
   """
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[4, 4, input.get_shape()[3], 1])
-    biases = tf.get_variable("biases", [1],
-        initializer=tf.constant_initializer(0.0))
+    biases = _biases("biases", [1])
 
     conv = tf.nn.conv2d(input, weights,
         strides=[1, 1, 1, 1], padding='SAME')
@@ -160,6 +176,8 @@ def _weights(name, shape, mean=0.0, stddev=0.02):
     shape: list of ints
     mean: mean of a Gaussian
     stddev: standard deviation of a Gaussian
+  Returns:
+    A trainable variable
   """
   var = tf.get_variable(
     name, shape,
@@ -167,15 +185,43 @@ def _weights(name, shape, mean=0.0, stddev=0.02):
       mean=mean, stddev=stddev, dtype=tf.float32))
   return var
 
+def _biases(name, shape, constant=0.0):
+  """ Helper to create an initialized Bias with constant
+  """
+  return tf.get_variable(name, shape,
+            initializer=tf.constant_initializer(constant))
+
 def _leaky_relu(input, slope):
   return tf.maximum(slope*input, input)
 
-def _batch_norm(input, is_training):
-  """ TODO: set hyper-parameter
-      TODO: instance normalization
+def _norm(input, is_training, norm='instance'):
+  """ Use Instance Normalization or Batch Normalization or None
   """
-  return tf.contrib.layers.batch_norm(input, decay=0.9, is_training=is_training)
+  if norm == 'instance':
+    return _instance_norm(input)
+  elif norm == 'batch':
+    return _batch_norm(input, is_training)
+  else:
+    return input
+
+def _batch_norm(input, is_training):
+  """ Batch Normalization
+  """
+  with tf.variable_scope("batch_norm"):
+    return tf.contrib.layers.batch_norm(input, decay=0.9, is_training=is_training)
+
+def _instance_norm(input):
+  """ Instance Normalization
+  """
+  with tf.variable_scope("instance_norm"):
+    depth = input.get_shape()[3]
+    scale = _weights("scale", [depth], mean=1.0)
+    offset = _biases("offset", [depth])
+    mean, variance = tf.nn.moments(input, axes=[1,2], keep_dims=True)
+    epsilon = 1e-5
+    inv = tf.rsqrt(variance + epsilon)
+    normalized = (input-mean)*inv
+    return scale*normalized + offset
 
 def safe_log(x, eps=1e-12):
   return tf.log(x + eps)
-

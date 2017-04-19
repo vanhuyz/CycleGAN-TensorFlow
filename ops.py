@@ -19,8 +19,7 @@ def c7s1_k(input, k, reuse=False, norm='instance', activation='relu', is_trainin
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[7, 7, input.get_shape()[3], k])
-    biases = tf.get_variable("biases", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases = _biases("biases", [k])
 
     padded = tf.pad(input, [[0,0],[3,3],[3,3],[0,0]], 'REFLECT')
     conv = tf.nn.conv2d(padded, weights,
@@ -50,8 +49,7 @@ def dk(input, k, reuse=False, norm='instance', is_training=True, name=None):
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[3, 3, input.get_shape()[3], k])
-    biases = tf.get_variable("biases", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases = _biases("biases", [k])
 
     conv = tf.nn.conv2d(input, weights,
         strides=[1, 2, 2, 1], padding='SAME')
@@ -74,8 +72,7 @@ def Rk(input, k, reuse=False, name=None):
     # layer 1
     weights1 = _weights("weights1",
       shape=[3, 3, input.get_shape()[3], k])
-    biases1 = tf.get_variable("biases1", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases1 = _biases("biases1", [k])
     padded1 = tf.pad(input, [[0,0],[2,2],[2,2],[0,0]], 'REFLECT')
     conv1 = tf.nn.conv2d(padded1, weights1,
         strides=[1, 1, 1, 1], padding='VALID')
@@ -84,8 +81,8 @@ def Rk(input, k, reuse=False, name=None):
     # layer 2
     weights2 = _weights("weights2",
       shape=[3, 3, relu1.get_shape()[3], k])
-    biases2 = tf.get_variable("biases2", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases2 = _biases("biases2", [k])
+
     padded2 = tf.pad(relu1, [[0,0],[2,2],[2,2],[0,0]], 'REFLECT')
     conv2 = tf.nn.conv2d(padded2, weights1,
         strides=[1, 1, 1, 1], padding='VALID')
@@ -112,8 +109,7 @@ def uk(input, k, reuse=False, norm='instance', is_training=True, name=None):
 
     weights = _weights("weights",
       shape=[3, 3, k, input_shape[3]])
-    biases = tf.get_variable("biases", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases = _biases("biases", [k])
 
     output_size = input_shape[1]*2
     output_shape = [input_shape[0], output_size, output_size, k]
@@ -142,8 +138,7 @@ def Ck(input, k, slope=0.2, stride=2, reuse=False, norm='instance', is_training=
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[4, 4, input.get_shape()[3], k])
-    biases = tf.get_variable("biases", [k],
-        initializer=tf.constant_initializer(0.0))
+    biases = _biases("biases", [k])
 
     conv = tf.nn.conv2d(input, weights,
         strides=[1, stride, stride, 1], padding='SAME')
@@ -164,8 +159,7 @@ def last_conv(input, reuse=False, use_sigmoid=False, name=None):
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[4, 4, input.get_shape()[3], 1])
-    biases = tf.get_variable("biases", [1],
-        initializer=tf.constant_initializer(0.0))
+    biases = _biases("biases", [1])
 
     conv = tf.nn.conv2d(input, weights,
         strides=[1, 1, 1, 1], padding='SAME')
@@ -191,6 +185,12 @@ def _weights(name, shape, mean=0.0, stddev=0.02):
       mean=mean, stddev=stddev, dtype=tf.float32))
   return var
 
+def _biases(name, shape, constant=0.0):
+  """ Helper to create an initialized Bias with constant
+  """
+  return tf.get_variable(name, shape,
+            initializer=tf.constant_initializer(constant))
+
 def _leaky_relu(input, slope):
   return tf.maximum(slope*input, input)
 
@@ -207,16 +207,21 @@ def _norm(input, is_training, norm='instance'):
 def _batch_norm(input, is_training):
   """ Batch Normalization
   """
-  return tf.contrib.layers.batch_norm(input, decay=0.9, is_training=is_training)
+  with tf.variable_scope("batch_norm"):
+    return tf.contrib.layers.batch_norm(input, decay=0.9, is_training=is_training)
 
 def _instance_norm(input):
   """ Instance Normalization
   """
-  mean, variance = tf.nn.moments(input, axes=[1,2], keep_dims=True)
-  epsilon = 1e-5
-  inv = tf.rsqrt(variance + epsilon)
-  normalized = (input-mean)*inv
-  return normalized
+  with tf.variable_scope("instance_norm"):
+    depth = input.get_shape()[3]
+    scale = _weights("scale", [depth], mean=1.0)
+    offset = _biases("offset", [depth])
+    mean, variance = tf.nn.moments(input, axes=[1,2], keep_dims=True)
+    epsilon = 1e-5
+    inv = tf.rsqrt(variance + epsilon)
+    normalized = (input-mean)*inv
+    return scale*normalized + offset
 
 def safe_log(x, eps=1e-12):
   return tf.log(x + eps)

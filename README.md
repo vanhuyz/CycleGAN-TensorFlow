@@ -42,9 +42,10 @@ $ python train.py  \
 Here is list of arguments:
 ```
 usage: train.py [-h] [--batch_size BATCH_SIZE] [--image_size IMAGE_SIZE]
-                [--use_lsgan [USE_LSGAN]] [--nouse_lsgan] [--lambda1 LAMBDA1]
-                [--lambda2 LAMBDA2] [--learning_rate LEARNING_RATE]
-                [--beta1 BETA1] [--X_train_file X_TRAIN_FILE]
+                [--use_lsgan [USE_LSGAN]] [--nouse_lsgan] [--norm NORM]
+                [--lambda1 LAMBDA1] [--lambda2 LAMBDA2]
+                [--learning_rate LEARNING_RATE] [--beta1 BETA1]
+                [--pool_size POOL_SIZE] [--X_train_file X_TRAIN_FILE]
                 [--Y_train_file Y_TRAIN_FILE]
 
 optional arguments:

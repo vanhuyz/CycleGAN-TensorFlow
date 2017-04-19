@@ -94,9 +94,6 @@ class CycleGAN:
     tf.summary.image('Y/generated', utils.batch_convert2int(self.F(y)))
     tf.summary.image('Y/reconstruction', utils.batch_convert2int(self.G(self.F(y))))
 
-    self.summary = tf.summary.merge_all()
-    self.saver = tf.train.Saver()
-
     return G_loss, D_Y_loss, F_loss, D_X_loss, fake_y, fake_x
 
   def optimize(self, G_loss, D_Y_loss, F_loss, D_X_loss):
@@ -120,6 +117,7 @@ class CycleGAN:
           )
 
       )
+      tf.summary.scalar('learning_rate/{}'.format(name), learning_rate)
 
       learning_step = (
           tf.train.AdamOptimizer(learning_rate, beta1=beta1, name=name)

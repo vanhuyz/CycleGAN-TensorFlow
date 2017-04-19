@@ -52,7 +52,10 @@ def train():
     )
     G_loss, D_Y_loss, F_loss, D_X_loss, fake_y, fake_x = cycle_gan.model()
     optimizers = cycle_gan.optimize(G_loss, D_Y_loss, F_loss, D_X_loss)
+
+    summary_op = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter(checkpoints_dir, graph)
+    saver = tf.train.Saver()
 
   with tf.Session(graph=graph) as sess:
     sess.run(tf.global_variables_initializer())
@@ -72,7 +75,7 @@ def train():
         # train
         _, G_loss_val, D_Y_loss_val, F_loss_val, D_X_loss_val, summary = (
               sess.run(
-                  [optimizers, G_loss, D_Y_loss, F_loss, D_X_loss, cycle_gan.summary],
+                  [optimizers, G_loss, D_Y_loss, F_loss, D_X_loss, summary_op],
                   feed_dict={cycle_gan.fake_y: fake_Y_pool.query(fake_y_val),
                              cycle_gan.fake_x: fake_X_pool.query(fake_x_val)}
               )
@@ -89,7 +92,7 @@ def train():
           logging.info('  D_X_loss : {}'.format(D_X_loss_val))
 
         if step % 10000 == 0:
-          save_path = cycle_gan.saver.save(sess, checkpoints_dir + "/model.ckpt", global_step=step)
+          save_path = saver.save(sess, checkpoints_dir + "/model.ckpt", global_step=step)
           logging.info("Model saved in file: %s" % save_path)
 
         step += 1
@@ -100,7 +103,7 @@ def train():
     except Exception as e:
       coord.request_stop(e)
     finally:
-      save_path = cycle_gan.saver.save(sess, checkpoints_dir + "/model.ckpt", global_step=step)
+      save_path = saver.save(sess, checkpoints_dir + "/model.ckpt", global_step=step)
       logging.info("Model saved in file: %s" % save_path)
       # When done, ask the threads to stop.
       coord.request_stop()

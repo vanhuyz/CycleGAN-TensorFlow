@@ -98,9 +98,9 @@ def data_writer(input_dir, output_file):
 
 def main(unused_argv):
   print("Dump X data...")
-  data_writer(X_INPUT_DIR, X_OUTPUT_FILE)
+  data_writer(FLAGS.X_input_dir, FLAGS.X_output_file)
   print("Dump Y data...")
-  data_writer(Y_INPUT_DIR, Y_OUTPUT_FILE)
+  data_writer(FLAGS.Y_input_dir, FLAGS.Y_output_file)
 
 if __name__ == '__main__':
   tf.app.run()

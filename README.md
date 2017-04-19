@@ -57,6 +57,8 @@ optional arguments:
                         use lsgan (mean squared error) or cross entropy loss,
                         default: True
   --nouse_lsgan
+  --norm NORM           [instance, batch] use instance norm or batch norm,
+                        default: instance
   --lambda1 LAMBDA1     weight for forward cycle loss (X->Y->X), default: 10.0
   --lambda2 LAMBDA2     weight for backward cycle loss (Y->X->Y), default: 10.0
   --learning_rate LEARNING_RATE
@@ -95,7 +97,3 @@ Here is some screenshots from TensorBoard.
 | | |
 |-------------------------|-------------------------|
 |![orang2apple](samples/orange2apple_1.png) | ![orang2apple](samples/orange2apple_2.png)|
-
-## TODO:
-
-* Instance normalization

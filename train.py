@@ -12,6 +12,8 @@ tf.flags.DEFINE_integer('batch_size', 1, 'batch size, default: 1')
 tf.flags.DEFINE_integer('image_size', 128, 'image size, default: 128')
 tf.flags.DEFINE_bool('use_lsgan', True,
                      'use lsgan (mean squared error) or cross entropy loss, default: True')
+tf.flags.DEFINE_string('norm', 'instance',
+                       '[instance, batch] use instance norm or batch norm, default: instance')
 tf.flags.DEFINE_integer('lambda1', 10.0,
                         'weight for forward cycle loss (X->Y->X), default: 10.0')
 tf.flags.DEFINE_integer('lambda2', 10.0,
@@ -42,6 +44,7 @@ def train():
         batch_size=FLAGS.batch_size,
         image_size=FLAGS.image_size,
         use_lsgan=FLAGS.use_lsgan,
+        norm=FLAGS.norm,
         lambda1=FLAGS.lambda1,
         lambda2=FLAGS.lambda1,
         learning_rate=FLAGS.learning_rate,

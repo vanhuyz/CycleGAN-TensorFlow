@@ -1,13 +1,18 @@
 import tensorflow as tf
 
-## Layers
+## Layers: follow the naming convention used in the original paper
 ### Generator layers
-def c7s1_k(input, k, reuse=False, batch_norm=True, activation='relu', is_training=True, name=None):
+def c7s1_k(input, k, reuse=False, norm='instance', activation='relu', is_training=True, name='c7s1_k'):
   """ A 7x7 Convolution-BatchNorm-ReLU layer with k filters and stride 1
   Args:
     input: 4D tensor
     k: integer, number of filters (output depth)
+    norm: 'instance' or 'batch' or None
+    activation: 'relu' or 'tanh'
     name: string, e.g. 'c7sk-32'
+    is_training: boolean or BoolTensor
+    name: string
+    reuse: boolean
   Returns:
     4D tensor
   """
@@ -21,22 +26,23 @@ def c7s1_k(input, k, reuse=False, batch_norm=True, activation='relu', is_trainin
     conv = tf.nn.conv2d(padded, weights,
         strides=[1, 1, 1, 1], padding='VALID')
 
-    if batch_norm == True:
-      output = _batch_norm(conv+biases, is_training)
-    else:
-      output = conv+biases
+    normalized = _norm(conv+biases, is_training, norm)
 
     if activation == 'relu':
-      output = tf.nn.relu(output)
+      output = tf.nn.relu(normalized)
     if activation == 'tanh':
-      output = tf.nn.tanh(output)
+      output = tf.nn.tanh(normalized)
     return output
 
-def dk(input, k, reuse=False, is_training=True, name=None):
+def dk(input, k, reuse=False, norm='instance', is_training=True, name=None):
   """ A 3x3 Convolution-BatchNorm-ReLU layer with k filters and stride 2
   Args:
     input: 4D tensor
     k: integer, number of filters (output depth)
+    norm: 'instance' or 'batch' or None
+    is_training: boolean or BoolTensor
+    name: string
+    reuse: boolean
     name: string, e.g. 'd64'
   Returns:
     4D tensor
@@ -49,13 +55,20 @@ def dk(input, k, reuse=False, is_training=True, name=None):
 
     conv = tf.nn.conv2d(input, weights,
         strides=[1, 2, 2, 1], padding='SAME')
-    bn = _batch_norm(conv+biases, is_training)
-    output = tf.nn.relu(bn)
+    normalized = _norm(conv+biases, is_training, norm)
+    output = tf.nn.relu(normalized)
     return output
 
 def Rk(input, k, reuse=False, name=None):
   """ A residual block that contains two 3x3 convolutional layers
       with the same number of filters on both layer
+  Args:
+    input: 4D Tensor
+    k: integer, number of filters (output depth)
+    reuse: boolean
+    name: string
+  Returns:
+    4D tensor (same shape as input)
   """
   with tf.variable_scope(name, reuse=reuse):
     # layer 1
@@ -81,12 +94,15 @@ def Rk(input, k, reuse=False, name=None):
     relu2 = tf.nn.relu(input+shaved)
     return relu2
 
-def uk(input, k, reuse=False, is_training=True, name=None):
+def uk(input, k, reuse=False, norm='instance', is_training=True, name=None):
   """ A 3x3 fractional-strided-Convolution-BatchNorm-ReLU layer
       with k filters, stride 1/2
   Args:
     input: 4D tensor
     k: integer, number of filters (output depth)
+    norm: 'instance' or 'batch' or None
+    is_training: boolean or BoolTensor
+    reuse: boolean
     name: string, e.g. 'c7sk-32'
   Returns:
     4D tensor
@@ -104,19 +120,21 @@ def uk(input, k, reuse=False, is_training=True, name=None):
     fsconv = tf.nn.conv2d_transpose(input, weights,
         output_shape=output_shape,
         strides=[1, 2, 2, 1], padding='SAME')
-    bn = _batch_norm(fsconv+biases, is_training)
-    output = tf.nn.relu(bn)
+    normalized = _norm(fsconv+biases, is_training, norm)
+    output = tf.nn.relu(normalized)
     return output
 
 ### Discriminator layers
-def Ck(input, k, slope=0.2, stride=2, reuse=False, use_batchnorm=True, is_training=True, name=None):
+def Ck(input, k, slope=0.2, stride=2, reuse=False, norm='instance', is_training=True, name=None):
   """ A 4x4 Convolution-BatchNorm-LeakyReLU layer with k filters and stride 2
   Args:
     input: 4D tensor
     k: integer, number of filters (output depth)
     slope: LeakyReLU's slope
     stride: integer
-    use_batchnorm: boolean
+    norm: 'instance' or 'batch' or None
+    is_training: boolean or BoolTensor
+    reuse: boolean
     name: string, e.g. 'C64'
   Returns:
     4D tensor
@@ -129,15 +147,19 @@ def Ck(input, k, slope=0.2, stride=2, reuse=False, use_batchnorm=True, is_traini
 
     conv = tf.nn.conv2d(input, weights,
         strides=[1, stride, stride, 1], padding='SAME')
-    h = conv+biases
-    if use_batchnorm:
-      h = _batch_norm(h, is_training)
-    output = _leaky_relu(h, slope)
+
+    normalized = _norm(conv+biases, is_training, norm)
+    output = _leaky_relu(normalized, slope)
     return output
 
 def last_conv(input, reuse=False, use_sigmoid=False, name=None):
   """ Last convolutional layer of discriminator network
       (1 filter with size 4x4, stride 1)
+  Args:
+    input: 4D tensor
+    reuse: boolean
+    use_sigmoid: boolean (False if use lsgan)
+    name: string, e.g. 'C64'
   """
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
@@ -160,6 +182,8 @@ def _weights(name, shape, mean=0.0, stddev=0.02):
     shape: list of ints
     mean: mean of a Gaussian
     stddev: standard deviation of a Gaussian
+  Returns:
+    A trainable variable
   """
   var = tf.get_variable(
     name, shape,
@@ -170,12 +194,29 @@ def _weights(name, shape, mean=0.0, stddev=0.02):
 def _leaky_relu(input, slope):
   return tf.maximum(slope*input, input)
 
+def _norm(input, is_training, norm='instance'):
+  """ Use Instance Normalization or Batch Normalization or None
+  """
+  if norm == 'instance':
+    return _instance_norm(input)
+  elif norm == 'batch':
+    return _batch_norm(input, is_training)
+  else:
+    return input
+
 def _batch_norm(input, is_training):
-  """ TODO: set hyper-parameter
-      TODO: instance normalization
+  """ Batch Normalization
   """
   return tf.contrib.layers.batch_norm(input, decay=0.9, is_training=is_training)
 
+def _instance_norm(input):
+  """ Instance Normalization
+  """
+  mean, variance = tf.nn.moments(input, axes=[1,2], keep_dims=True)
+  epsilon = 1e-5
+  inv = tf.rsqrt(variance + epsilon)
+  normalized = (input-mean)*inv
+  return normalized
+
 def safe_log(x, eps=1e-12):
   return tf.log(x + eps)
-

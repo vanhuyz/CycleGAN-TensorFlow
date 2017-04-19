@@ -114,7 +114,7 @@ class CycleGAN:
       learning_rate = (
           tf.where(
                   tf.greater_equal(global_step, start_decay_step),
-                  tf.train.polynomial_decay(starter_learning_rate, global_step,
+                  tf.train.polynomial_decay(starter_learning_rate, global_step-start_decay_step,
                                             decay_steps, end_learning_rate,
                                             power=1.0),
                   starter_learning_rate

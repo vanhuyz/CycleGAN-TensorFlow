@@ -37,6 +37,8 @@ class CycleGAN:
     self.lambda2 = lambda2
     self.use_lsgan = use_lsgan
     use_sigmoid = not use_lsgan
+    self.batch_size = batch_size
+    self.image_size = image_size
     self.learning_rate = learning_rate
     self.beta1 = beta1
     self.X_train_file = X_train_file
@@ -57,8 +59,10 @@ class CycleGAN:
         shape=[batch_size, image_size, image_size, 3])
 
   def model(self):
-    X_reader = Reader(self.X_train_file, name='X')
-    Y_reader = Reader(self.Y_train_file, name='Y')
+    X_reader = Reader(self.X_train_file, name='X',
+        image_size=self.image_size, batch_size=self.batch_size)
+    Y_reader = Reader(self.Y_train_file, name='Y',
+        image_size=self.image_size, batch_size=self.batch_size)
 
     x = X_reader.feed()
     y = Y_reader.feed()

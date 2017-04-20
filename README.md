@@ -19,10 +19,10 @@ $ bash download_dataset.sh apple2orange
 * Write the dataset to tfrecords
 
 ```bash
-$ python dump.py
+$ python build_data.py
 ```
 
-Check `$ python dump.py --help` if you want to change default paths.
+Check `$ python build_data.py --help` if you want to change default paths.
 
 ## Training
 

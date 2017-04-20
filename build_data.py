@@ -97,9 +97,9 @@ def data_writer(input_dir, output_file):
   writer.close()
 
 def main(unused_argv):
-  print("Dump X data...")
+  print("Convert X data to tfrecords...")
   data_writer(FLAGS.X_input_dir, FLAGS.X_output_file)
-  print("Dump Y data...")
+  print("Convert Y data to tfrecords...")
   data_writer(FLAGS.Y_input_dir, FLAGS.Y_output_file)
 
 if __name__ == '__main__':

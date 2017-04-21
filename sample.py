@@ -6,7 +6,7 @@ import utils
 FLAGS = tf.flags.FLAGS
 
 tf.flags.DEFINE_string('model', '', 'model path (.pb)')
-tf.flags.DEFINE_string('img', '', 'image path')
+tf.flags.DEFINE_string('img', '', 'image path (.jpg)')
 
 def sample():
   """Translate image to image (currently only support image with size 128x128)"""

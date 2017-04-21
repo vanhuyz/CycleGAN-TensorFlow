@@ -4,7 +4,12 @@ from tensorflow.python.tools.freeze_graph import freeze_graph
 from model import CycleGAN
 import utils
 
-CKPT_DIR = './checkpoints/apple2orange_final'
+FLAGS = tf.flags.FLAGS
+
+tf.flags.DEFINE_string('checkpoints_dir', '', 'checkpoints directory path')
+tf.flags.DEFINE_string('XtoY_model', '', 'XtoY model name, e.g. apple2orange.pb')
+tf.flags.DEFINE_string('YtoX_model', '', 'YtoX model name, e.g. orange2apple.pb')
+
 
 def export_graph(model_name, XtoY=True):
   graph = tf.Graph()
@@ -25,15 +30,18 @@ def export_graph(model_name, XtoY=True):
 
   with tf.Session(graph=graph) as sess:
     sess.run(tf.global_variables_initializer())
-    latest_ckpt = tf.train.latest_checkpoint(CKPT_DIR)
+    latest_ckpt = tf.train.latest_checkpoint(FLAGS.checkpoints_dir)
     restore_saver.restore(sess, latest_ckpt)
     output_graph_def = tf.graph_util.convert_variables_to_constants(
         sess, graph.as_graph_def(), [output_image.op.name])
 
     tf.train.write_graph(output_graph_def, 'pretrained', model_name, as_text=False)
 
-if __name__ == '__main__':
+def main(unused_argv):
   print('Export XtoY model...')
-  export_graph('apple2orange.pb', XtoY=True)
+  export_graph(FLAGS.XtoY_model, XtoY=True)
   print('Export YtoX model...')
-  export_graph('orange2apple.pb', XtoY=False)
+  export_graph(FLAGS.YtoX_model, XtoY=False)
+
+if __name__ == '__main__':
+  tf.app.run()

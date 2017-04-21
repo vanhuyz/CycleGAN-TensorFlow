@@ -6,14 +6,15 @@ import utils
 FLAGS = tf.flags.FLAGS
 
 tf.flags.DEFINE_string('model', '', 'model path (.pb)')
-tf.flags.DEFINE_string('img', '', 'image path (.jpg)')
+tf.flags.DEFINE_string('input', 'input_sample.jpg', 'input image path (.jpg)')
+tf.flags.DEFINE_string('output', 'output_sample.jpg', 'output image path (.jpg)')
 
 def sample():
   """Translate image to image (currently only support image with size 128x128)"""
   graph = tf.Graph()
 
   with graph.as_default():
-    with tf.gfile.FastGFile(FLAGS.img, 'r') as f:
+    with tf.gfile.FastGFile(FLAGS.input, 'r') as f:
       image_data = f.read()
       input_image = tf.image.decode_jpeg(image_data, channels=3)
       input_image = tf.image.resize_images(input_image, size=(128, 128))
@@ -30,10 +31,7 @@ def sample():
 
   with tf.Session(graph=graph) as sess:
     generated = output_image.eval()
-    samples_dir = 'samples'
-    os.makedirs(samples_dir, exist_ok=True)
-    samples_file = os.path.join(samples_dir, 'sample.jpg')
-    with open(samples_file, 'wb') as f:
+    with open(FLAGS.output, 'wb') as f:
       f.write(generated)
 
 def main(unused_argv):

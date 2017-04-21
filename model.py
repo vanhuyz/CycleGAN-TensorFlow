@@ -9,16 +9,16 @@ REAL_LABEL = 0.9
 
 class CycleGAN:
   def __init__(self,
-               X_train_file,
-               Y_train_file,
-               batch_size,
-               image_size,
-               use_lsgan,
-               norm,
-               lambda1,
-               lambda2,
-               learning_rate,
-               beta1
+               X_train_file='',
+               Y_train_file='',
+               batch_size=1,
+               image_size=128,
+               use_lsgan=True,
+               norm='instance',
+               lambda1=10.0,
+               lambda2=10.0,
+               learning_rate=2e-4,
+               beta1=0.5
               ):
     """
     Args:

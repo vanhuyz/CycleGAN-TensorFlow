@@ -91,6 +91,12 @@ def Rk(input, k, reuse=False, name=None):
     relu2 = tf.nn.relu(input+shaved)
     return relu2
 
+def n_res_blocks(input, reuse, n=6):
+  for i in range(1,n+1):
+    output = Rk(input, 128, reuse, name='R128_{}'.format(i))
+    input = output
+  return output
+
 def uk(input, k, reuse=False, norm='instance', is_training=True, name=None):
   """ A 3x3 fractional-strided-Convolution-BatchNorm-ReLU layer
       with k filters, stride 1/2

@@ -26,7 +26,7 @@ class Generator:
       d128 = ops.dk(d64, 128, is_training=self.is_training, norm=self.norm,
           reuse=self.reuse, name='d128')                                # (?, w/4, h/4, 128)
 
-      if self.image_size == 128:
+      if self.image_size <= 128:
         # use 6 residual blocks for 128x128 images
         res_output = ops.n_res_blocks(d128, reuse=self.reuse, n=6)      # (?, w/4, h/4, 128)
       else:

@@ -46,7 +46,7 @@ class CycleGAN:
 
     self.is_training = tf.placeholder_with_default(True, shape=[], name='is_training')
 
-    self.G = Generator('G', self.is_training, norm=norm)
+    self.G = Generator('G', self.is_training, norm=norm, image_size=image_size)
     self.D_Y = Discriminator('D_Y',
         self.is_training, norm=norm, use_sigmoid=use_sigmoid)
     self.F = Generator('F', self.is_training, norm=norm)

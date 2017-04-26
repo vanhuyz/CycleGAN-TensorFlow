@@ -130,7 +130,7 @@ python export_graph.py --model pretrained/apple2orange.pb \
 My pretrained models are available at https://github.com/vanhuyz/CycleGAN-TensorFlow/releases
 
 ## Contributing
-Please open an issue if you have any trouble or found something incorrect in my code :)
+Please open an issue if you have any trouble or found anything incorrect in my code :)
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

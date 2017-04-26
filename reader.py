@@ -2,7 +2,7 @@ import tensorflow as tf
 import utils
 
 class Reader():
-  def __init__(self, tfrecords_file, image_size=128,
+  def __init__(self, tfrecords_file, image_size=256,
     min_queue_examples=1000, batch_size=1, num_threads=8, name=''):
     """
     Args:

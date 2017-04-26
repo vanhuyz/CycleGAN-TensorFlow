@@ -12,7 +12,7 @@ class CycleGAN:
                X_train_file='',
                Y_train_file='',
                batch_size=1,
-               image_size=128,
+               image_size=256,
                use_lsgan=True,
                norm='instance',
                lambda1=10.0,

@@ -3,6 +3,21 @@ An implementation of CycleGan using TensorFlow (work in progess).
 
 Original paper: https://arxiv.org/abs/1703.10593
 
+## Some good results on test data
+
+### apple -> orange
+
+| Input | Output | | Input | Output | | Input | Output |
+|-------|--------|-|-------|--------|-|-------|--------|
+|![apple2orange_1](samples/real_apple2orange_1.jpg) | ![apple2orange_1](samples/fake_apple2orange_1.jpg)| |![apple2orange_2](samples/real_apple2orange_2.jpg) | ![apple2orange_2](samples/fake_apple2orange_2.jpg)| |![apple2orange_3](samples/real_apple2orange_3.jpg) | ![apple2orange_3](samples/fake_apple2orange_3.jpg)|
+
+
+### orange -> apple
+
+| Input | Output | | Input | Output | | Input | Output |
+|-------|--------|-|-------|--------|-|-------|--------|
+|![orange2apple_1](samples/real_orange2apple_1.jpg) | ![orange2apple_1](samples/fake_orange2apple_1.jpg)| |![orange2apple_2](samples/real_orange2apple_2.jpg) | ![orange2apple_2](samples/fake_orange2apple_2.jpg)| |![orange2apple_3](samples/real_orange2apple_3.jpg) | ![orange2apple_3](samples/fake_orange2apple_3.jpg)|
+
 ## Environment
 
 * TensorFlow 1.0.0
@@ -38,8 +53,7 @@ $ python train.py  \
     --Y_train_file=data/tfrecords/zebra.tfrecords
 ```
 
-
-Here is list of arguments:
+Here is the list of arguments:
 ```
 usage: train.py [-h] [--batch_size BATCH_SIZE] [--image_size IMAGE_SIZE]
                 [--use_lsgan [USE_LSGAN]] [--nouse_lsgan] [--norm NORM]
@@ -53,7 +67,8 @@ optional arguments:
   --batch_size BATCH_SIZE
                         batch size, default: 1
   --image_size IMAGE_SIZE
-                        image size, default: 128
+                        image size, default: 256
+
   --use_lsgan [USE_LSGAN]
                         use lsgan (mean squared error) or cross entropy loss,
                         default: True
@@ -68,10 +83,10 @@ optional arguments:
   --pool_size POOL_SIZE
                         size of image buffer that stores previously generated
                         images, default: 50
-  --X_train_file X_TRAIN_FILE
+  --X X
                         X tfrecords file for training,
                         default: data/tfrecords/apple.tfrecords
-  --Y_train_file Y_TRAIN_FILE
+  --Y Y
                         Y tfrecords file for training,
                         default: data/tfrecords/orange.tfrecords
 ```
@@ -82,19 +97,40 @@ Check TensorBoard to see training progress and generated images.
 $ tensorboard --logdir checkpoints/${datetime}
 ```
 
-## Samples
+### Notes
+If you observe that background colors of input and generated images are high contrast (black becomes white for example), you should restart your training.
 
-Here is some screenshots from TensorBoard.
+## Export model
+You can export model from a checkpoint to a standalone GraphDef file as follow:
 
-* apple -> orange
+```bash
+$ python export_graph.py --checkpoint_dir checkpoints/${datetime}} \
+                         --XtoY_model apple2orange.pb \
+                         --YtoX_model orange2apple.pb \
+                         --image_size 256
+```
 
-| | |
-|-------------------------|-------------------------|
-|![apple2orange](samples/apple2orange_1.png) | ![apple2orange](samples/apple2orange_2.png)|
 
+## Inference
+After exporting model, you can use it to inference as follow:
 
-* orange -> apple
+```bash
+python export_graph.py --model pretrained/apple2orange.pb \
+                       --input input_sample.jpg \
+                       --output output_sample.jpg \
+                       --image_size 256
+```
 
-| | |
-|-------------------------|-------------------------|
-|![orang2apple](samples/orange2apple_1.png) | ![orang2apple](samples/orange2apple_2.png)|
+## Pretrained models
+My pretrained models wiil be available at https://github.com/vanhuyz/CycleGAN-TensorFlow/releases
+
+## Contributing
+Please open an issue if you have any trouble or found something incorrect in my code :)
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+* CycleGAN paper: https://arxiv.org/abs/1703.10593
+* Official source code in Torch: https://github.com/junyanz/CycleGAN

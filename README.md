@@ -68,10 +68,10 @@ optional arguments:
   --pool_size POOL_SIZE
                         size of image buffer that stores previously generated
                         images, default: 50
-  --X_train_file X_TRAIN_FILE
+  --X X
                         X tfrecords file for training,
                         default: data/tfrecords/apple.tfrecords
-  --Y_train_file Y_TRAIN_FILE
+  --Y Y
                         Y tfrecords file for training,
                         default: data/tfrecords/orange.tfrecords
 ```
@@ -81,6 +81,9 @@ Check TensorBoard to see training progress and generated images.
 ```
 $ tensorboard --logdir checkpoints/${datetime}
 ```
+
+### Notes
+If you observe that background colors of input and generated images are high contrast (black becomes white for example), you should restart your training.
 
 ## Samples
 
@@ -98,3 +101,38 @@ Here is some screenshots from TensorBoard.
 | | |
 |-------------------------|-------------------------|
 |![orang2apple](samples/orange2apple_1.png) | ![orang2apple](samples/orange2apple_2.png)|
+
+## Export model
+You can export model from a checkpoint to a standalone GraphDef file as follow:
+
+```bash
+$ python export_graph.py --checkpoint_dir checkpoints/${datetime}} \
+                         --XtoY_model apple2orange.pb \
+                         --YtoX_model orange2apple.pb \
+                         --image_size 128
+```
+
+
+## Inference
+After exporting model, you can use it to inference as follow:
+
+```bash
+python export_graph.py --model pretrained/apple2orange.pb \
+                       --input input_sample.jpg \
+                       --output output_sample.jpg \
+                       --image_size 128
+```
+
+## Pretrained models
+My pretrained models wiil be available at https://github.com/vanhuyz/CycleGAN-TensorFlow/releases
+
+## Contributing
+Please open an issue if you have any trouble or found something incorrect in my code :)
+
+## License
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Acknowledgments
+
+* CycleGAN paper: https://arxiv.org/abs/1703.10593
+* Official source code in Torch: https://github.com/junyanz/CycleGAN

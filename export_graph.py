@@ -1,3 +1,12 @@
+""" Freeze variables and convert 2 generator networks to 2 GraphDef files.
+This makes file size smaller and can be use for inference only in production.
+An example of command-line usage is:
+python export_graph.py --checkpoint_dir checkpoints/20170424-1152 \
+                       --XtoY_model apple2orange.pb \
+                       --YtoX_model orange2apple.pb \
+                       --image_size 128
+"""
+
 import tensorflow as tf
 import os
 from tensorflow.python.tools.freeze_graph import freeze_graph
@@ -6,10 +15,10 @@ import utils
 
 FLAGS = tf.flags.FLAGS
 
-tf.flags.DEFINE_string('checkpoints_dir', '', 'checkpoints directory path')
-tf.flags.DEFINE_string('XtoY_model', '', 'XtoY model name, e.g. apple2orange.pb')
-tf.flags.DEFINE_string('YtoX_model', '', 'YtoX model name, e.g. orange2apple.pb')
-
+tf.flags.DEFINE_string('checkpoint_dir', '', 'checkpoints directory path')
+tf.flags.DEFINE_string('XtoY_model', 'apple2orange.pb', 'XtoY model name, default: apple2orange.pb')
+tf.flags.DEFINE_string('YtoX_model', 'orange2apple.pb', 'YtoX model name, default: orange2apple.pb')
+tf.flags.DEFINE_integer('image_size', '128', 'image size, default: 128')
 
 def export_graph(model_name, XtoY=True):
   graph = tf.Graph()
@@ -17,7 +26,7 @@ def export_graph(model_name, XtoY=True):
   with graph.as_default():
     cycle_gan = CycleGAN(norm='instance')
 
-    input_image = tf.placeholder(tf.float32, shape=[128, 128, 3], name='input_image')
+    input_image = tf.placeholder(tf.float32, shape=[FLAGS.image_size, FLAGS.image_size, 3], name='input_image')
     cycle_gan.model()
     if XtoY:
       output_image = cycle_gan.G.sample(tf.expand_dims(input_image, 0))
@@ -30,7 +39,7 @@ def export_graph(model_name, XtoY=True):
 
   with tf.Session(graph=graph) as sess:
     sess.run(tf.global_variables_initializer())
-    latest_ckpt = tf.train.latest_checkpoint(FLAGS.checkpoints_dir)
+    latest_ckpt = tf.train.latest_checkpoint(FLAGS.checkpoint_dir)
     restore_saver.restore(sess, latest_ckpt)
     output_graph_def = tf.graph_util.convert_variables_to_constants(
         sess, graph.as_graph_def(), [output_image.op.name])

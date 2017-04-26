@@ -25,9 +25,9 @@ tf.flags.DEFINE_float('beta1', 0.5,
 tf.flags.DEFINE_float('pool_size', 50,
                       'size of image buffer that stores previously generated images, default: 50')
 
-tf.flags.DEFINE_string('X_train_file', 'data/tfrecords/apple.tfrecords',
+tf.flags.DEFINE_string('X', 'data/tfrecords/apple.tfrecords',
                        'X tfrecords file for training, default: data/tfrecords/apple.tfrecords')
-tf.flags.DEFINE_string('Y_train_file', 'data/tfrecords/orange.tfrecords',
+tf.flags.DEFINE_string('Y', 'data/tfrecords/orange.tfrecords',
                        'Y tfrecords file for training, default: data/tfrecords/orange.tfrecords')
 
 
@@ -39,8 +39,8 @@ def train():
   graph = tf.Graph()
   with graph.as_default():
     cycle_gan = CycleGAN(
-        X_train_file=FLAGS.X_train_file,
-        Y_train_file=FLAGS.Y_train_file,
+        X_train_file=FLAGS.X,
+        Y_train_file=FLAGS.Y,
         batch_size=FLAGS.batch_size,
         image_size=FLAGS.image_size,
         use_lsgan=FLAGS.use_lsgan,

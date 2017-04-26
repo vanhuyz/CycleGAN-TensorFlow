@@ -49,8 +49,8 @@ If you want to change some default settings, you can pass those to the command l
 
 ```bash
 $ python train.py  \
-    --X_train_file=data/tfrecords/horse.tfrecords \
-    --Y_train_file=data/tfrecords/zebra.tfrecords
+    --X=data/tfrecords/horse.tfrecords \
+    --Y=data/tfrecords/zebra.tfrecords
 ```
 
 Here is the list of arguments:
@@ -59,8 +59,7 @@ usage: train.py [-h] [--batch_size BATCH_SIZE] [--image_size IMAGE_SIZE]
                 [--use_lsgan [USE_LSGAN]] [--nouse_lsgan] [--norm NORM]
                 [--lambda1 LAMBDA1] [--lambda2 LAMBDA2]
                 [--learning_rate LEARNING_RATE] [--beta1 BETA1]
-                [--pool_size POOL_SIZE] [--X_train_file X_TRAIN_FILE]
-                [--Y_train_file Y_TRAIN_FILE]
+                [--pool_size POOL_SIZE] [--X X] [--Y Y]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -97,8 +96,15 @@ Check TensorBoard to see training progress and generated images.
 $ tensorboard --logdir checkpoints/${datetime}
 ```
 
+These are some interesting screenshots from TensorBoard when training orange -> apple:
+
+![train_screenshot](samples/train_screenshot.png)
+
+
+
+
 ### Notes
-If you observe that background colors of input and generated images are high contrast (black becomes white for example), you should restart your training.
+If you observe that background colors of input and generated images are high contrast (e.g. black becomes white), you should restart your training!
 
 ## Export model
 You can export model from a checkpoint to a standalone GraphDef file as follow:

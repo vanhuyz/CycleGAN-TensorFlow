@@ -37,7 +37,7 @@ $ bash download_dataset.sh apple2orange
 $ python build_data.py
 ```
 
-Check `$ python build_data.py --help` if you want to change default paths.
+Check `$ python build_data.py --help` for more details.
 
 ## Training
 
@@ -102,10 +102,11 @@ These are some interesting screenshots from TensorBoard when training orange -> 
 
 
 ### Notes
-If you observe that background colors of input and generated images are high contrast (e.g. black becomes white), you should restart your training!
+* If you observe that background colors of input and generated images are high contrast (e.g. black becomes white), you should restart your training!
+* Train several times to get the best models.
 
 ## Export model
-You can export model from a checkpoint to a standalone GraphDef file as follow:
+You can export from a checkpoint to a standalone GraphDef file as follow:
 
 ```bash
 $ python export_graph.py --checkpoint_dir checkpoints/${datetime}} \
@@ -116,7 +117,7 @@ $ python export_graph.py --checkpoint_dir checkpoints/${datetime}} \
 
 
 ## Inference
-After exporting model, you can use it to inference as follow:
+After exporting model, you can use it for inference. For example:
 
 ```bash
 python export_graph.py --model pretrained/apple2orange.pb \

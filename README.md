@@ -96,7 +96,7 @@ Check TensorBoard to see training progress and generated images.
 $ tensorboard --logdir checkpoints/${datetime}
 ```
 
-These are some interesting screenshots from TensorBoard when training orange -> apple:
+Here are some funny screenshots from TensorBoard when training orange -> apple:
 
 ![train_screenshot](samples/train_screenshot.png)
 

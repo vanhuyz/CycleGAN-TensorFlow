@@ -135,7 +135,7 @@ Please open an issue if you have any trouble or found anything incorrect in my c
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## References
 
 * CycleGAN paper: https://arxiv.org/abs/1703.10593
 * Official source code in Torch: https://github.com/junyanz/CycleGAN

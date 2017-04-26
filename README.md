@@ -82,11 +82,6 @@ Check TensorBoard to see training progress and generated images.
 $ tensorboard --logdir checkpoints/${datetime}
 ```
 
-### Notes
-If you observe that background colors of input and generated images are high contrast (black becomes white for example), you should restart your training.
-
-## Samples
-
 Here is some screenshots from TensorBoard.
 
 * apple -> orange
@@ -101,6 +96,9 @@ Here is some screenshots from TensorBoard.
 | | |
 |-------------------------|-------------------------|
 |![orang2apple](samples/orange2apple_1.png) | ![orang2apple](samples/orange2apple_2.png)|
+
+### Notes
+If you observe that background colors of input and generated images are high contrast (black becomes white for example), you should restart your training.
 
 ## Export model
 You can export model from a checkpoint to a standalone GraphDef file as follow:

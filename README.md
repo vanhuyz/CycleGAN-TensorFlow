@@ -1,9 +1,9 @@
 # CycleGAN-TensorFlow
-An implementation of CycleGan using TensorFlow (work in progess).
+An implementation of CycleGan using TensorFlow.
 
 Original paper: https://arxiv.org/abs/1703.10593
 
-## Some good results on test data
+## Results on test data
 
 ### apple -> orange
 
@@ -101,8 +101,6 @@ These are some interesting screenshots from TensorBoard when training orange -> 
 ![train_screenshot](samples/train_screenshot.png)
 
 
-
-
 ### Notes
 If you observe that background colors of input and generated images are high contrast (e.g. black becomes white), you should restart your training!
 
@@ -128,7 +126,7 @@ python export_graph.py --model pretrained/apple2orange.pb \
 ```
 
 ## Pretrained models
-My pretrained models wiil be available at https://github.com/vanhuyz/CycleGAN-TensorFlow/releases
+My pretrained models are available at https://github.com/vanhuyz/CycleGAN-TensorFlow/releases
 
 ## Contributing
 Please open an issue if you have any trouble or found something incorrect in my code :)

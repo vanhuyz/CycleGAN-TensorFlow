@@ -22,7 +22,7 @@ def inference():
   graph = tf.Graph()
 
   with graph.as_default():
-    with tf.gfile.FastGFile(FLAGS.input, 'r') as f:
+    with tf.gfile.FastGFile(FLAGS.input, 'rb') as f:
       image_data = f.read()
       input_image = tf.image.decode_jpeg(image_data, channels=3)
       input_image = tf.image.resize_images(input_image, size=(FLAGS.image_size, FLAGS.image_size))

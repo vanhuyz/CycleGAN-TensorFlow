@@ -1,3 +1,4 @@
+# !/bin/bash
 # https://github.com/junyanz/CycleGAN/blob/master/datasets/download_dataset.sh
 
 FILE=$1

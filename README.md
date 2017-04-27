@@ -34,21 +34,21 @@ $ bash download_dataset.sh apple2orange
 * Write the dataset to tfrecords
 
 ```bash
-$ python build_data.py
+$ python3 build_data.py
 ```
 
-Check `$ python build_data.py --help` for more details.
+Check `$ python3 build_data.py --help` for more details.
 
 ## Training
 
 ```bash
-$ python train.py
+$ python3 train.py
 ```
 
 If you want to change some default settings, you can pass those to the command line, such as:
 
 ```bash
-$ python train.py  \
+$ python3 train.py  \
     --X=data/tfrecords/horse.tfrecords \
     --Y=data/tfrecords/zebra.tfrecords
 ```
@@ -109,7 +109,7 @@ Here are some funny screenshots from TensorBoard when training orange -> apple:
 You can export from a checkpoint to a standalone GraphDef file as follow:
 
 ```bash
-$ python export_graph.py --checkpoint_dir checkpoints/${datetime}} \
+$ python3 export_graph.py --checkpoint_dir checkpoints/${datetime}} \
                          --XtoY_model apple2orange.pb \
                          --YtoX_model orange2apple.pb \
                          --image_size 256
@@ -120,7 +120,7 @@ $ python export_graph.py --checkpoint_dir checkpoints/${datetime}} \
 After exporting model, you can use it for inference. For example:
 
 ```bash
-python export_graph.py --model pretrained/apple2orange.pb \
+python3 inference.py --model pretrained/apple2orange.pb \
                        --input input_sample.jpg \
                        --output output_sample.jpg \
                        --image_size 256

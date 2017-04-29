@@ -102,14 +102,14 @@ Here are some funny screenshots from TensorBoard when training orange -> apple:
 
 
 ### Notes
-* If you observe that background colors of input and generated images are high contrast (e.g. black becomes white), you should restart your training!
+* If high constrast background colors between input and generated images are observed (e.g. black becomes white), you should restart your training!
 * Train several times to get the best models.
 
 ## Export model
 You can export from a checkpoint to a standalone GraphDef file as follow:
 
 ```bash
-$ python3 export_graph.py --checkpoint_dir checkpoints/${datetime}} \
+$ python3 export_graph.py --checkpoint_dir checkpoints/${datetime} \
                          --XtoY_model apple2orange.pb \
                          --YtoX_model orange2apple.pb \
                          --image_size 256

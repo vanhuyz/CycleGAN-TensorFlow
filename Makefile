@@ -14,6 +14,9 @@ OUTPUT_IMG = output_sample.jpg
 MODEL = $(X)2$(Y).pb
 
 # commands come here
+download_data:
+	bash download_dataset.sh $(X)2$(Y)
+
 build_data:
 	python3 build_data.py --X_input_dir=data/$(X)2$(Y)/trainA \
                         --Y_input_dir=data/$(X)2$(Y)/trainB \
@@ -38,3 +41,6 @@ inference:
                        --input=$(INPUT_IMG) \
                        --output=$(OUTPUT_IMG) \
                        --image_size=$(IMAGE_SIZE)
+
+tensorboard:
+	tensorboard --logdir checkpoints/`ls checkpoints | tail -n 1`

@@ -82,6 +82,7 @@ optional arguments:
   --pool_size POOL_SIZE
                         size of image buffer that stores previously generated
                         images, default: 50
+  --ngf NGF             number of gen filters in first conv layer, default: 64
   --X X
                         X tfrecords file for training,
                         default: data/tfrecords/apple.tfrecords
@@ -110,9 +111,9 @@ You can export from a checkpoint to a standalone GraphDef file as follow:
 
 ```bash
 $ python3 export_graph.py --checkpoint_dir checkpoints/${datetime} \
-                         --XtoY_model apple2orange.pb \
-                         --YtoX_model orange2apple.pb \
-                         --image_size 256
+                          --XtoY_model apple2orange.pb \
+                          --YtoX_model orange2apple.pb \
+                          --image_size 256
 ```
 
 
@@ -121,9 +122,9 @@ After exporting model, you can use it for inference. For example:
 
 ```bash
 python3 inference.py --model pretrained/apple2orange.pb \
-                       --input input_sample.jpg \
-                       --output output_sample.jpg \
-                       --image_size 256
+                     --input input_sample.jpg \
+                     --output output_sample.jpg \
+                     --image_size 256
 ```
 
 ## Pretrained models

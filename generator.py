@@ -3,9 +3,10 @@ import ops
 import utils
 
 class Generator:
-  def __init__(self, name, is_training, norm='instance', image_size=128):
+  def __init__(self, name, is_training, ngf=64, norm='instance', image_size=128):
     self.name = name
     self.reuse = False
+    self.ngf = ngf
     self.norm = norm
     self.is_training = is_training
     self.image_size = image_size
@@ -19,11 +20,11 @@ class Generator:
     """
     with tf.variable_scope(self.name):
       # conv layers
-      c7s1_32 = ops.c7s1_k(input, 32, is_training=self.is_training, norm=self.norm,
+      c7s1_32 = ops.c7s1_k(input, self.ngf, is_training=self.is_training, norm=self.norm,
           reuse=self.reuse, name='c7s1_32')                             # (?, w, h, 32)
-      d64 = ops.dk(c7s1_32, 64, is_training=self.is_training, norm=self.norm,
+      d64 = ops.dk(c7s1_32, 2*self.ngf, is_training=self.is_training, norm=self.norm,
           reuse=self.reuse, name='d64')                                 # (?, w/2, h/2, 64)
-      d128 = ops.dk(d64, 128, is_training=self.is_training, norm=self.norm,
+      d128 = ops.dk(d64, 4*self.ngf, is_training=self.is_training, norm=self.norm,
           reuse=self.reuse, name='d128')                                # (?, w/4, h/4, 128)
 
       if self.image_size <= 128:
@@ -34,9 +35,9 @@ class Generator:
         res_output = ops.n_res_blocks(d128, reuse=self.reuse, n=9)      # (?, w/4, h/4, 128)
 
       # fractional-strided convolution
-      u64 = ops.uk(res_output, 64, is_training=self.is_training, norm=self.norm,
+      u64 = ops.uk(res_output, 2*self.ngf, is_training=self.is_training, norm=self.norm,
           reuse=self.reuse, name='u64')                                 # (?, w/2, h/2, 64)
-      u32 = ops.uk(u64, 32, is_training=self.is_training, norm=self.norm,
+      u32 = ops.uk(u64, self.ngf, is_training=self.is_training, norm=self.norm,
           reuse=self.reuse, name='u32')                                 # (?, w, h, 32)
 
       # conv layer

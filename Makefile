@@ -28,7 +28,7 @@ train:
                    --image_size=$(IMAGE_SIZE) \
                    --ngf=$(NGF) \
                    --X=data/tfrecords/$(X).tfrecords \
-                   --y=data/tfrecords/$(Y).tfrecords
+                   --Y=data/tfrecords/$(Y).tfrecords
 
 export_graph:
 	python3 export_graph.py --checkpoint_dir=$(CHECKPOINT_DIR) \

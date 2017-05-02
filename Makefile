@@ -2,16 +2,16 @@
 BATCH_SIZE = 1
 IMAGE_SIZE = 256
 NGF = 64
-X = 'apple'
-Y = 'orange'
+X = apple
+Y = orange
 
 # for export_graph: default the last directory in checkpoints
 CHECKPOINT_DIR = `ls checkpoints | tail -n 1`
 
 # for reference
-INPUT_IMG = 'input_sample.jpg'
-OUTPUT_IMG = 'output_sample.jpg'
-MODEL = '$(X)2$(Y).pb'
+INPUT_IMG = input_sample.jpg
+OUTPUT_IMG = output_sample.jpg
+MODEL = $(X)2$(Y).pb
 
 # commands come here
 build_data:

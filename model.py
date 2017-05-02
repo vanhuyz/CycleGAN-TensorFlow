@@ -18,7 +18,8 @@ class CycleGAN:
                lambda1=10.0,
                lambda2=10.0,
                learning_rate=2e-4,
-               beta1=0.5
+               beta1=0.5,
+               ngf=64
               ):
     """
     Args:
@@ -32,6 +33,7 @@ class CycleGAN:
       norm: 'instance' or 'batch'
       learning_rate: float, initial learning rate for Adam
       beta1: float, momentum term of Adam
+      ngf: number of gen filters in first conv layer
     """
     self.lambda1 = lambda1
     self.lambda2 = lambda2
@@ -46,7 +48,7 @@ class CycleGAN:
 
     self.is_training = tf.placeholder_with_default(True, shape=[], name='is_training')
 
-    self.G = Generator('G', self.is_training, norm=norm, image_size=image_size)
+    self.G = Generator('G', self.is_training, ngf=ngf, norm=norm, image_size=image_size)
     self.D_Y = Discriminator('D_Y',
         self.is_training, norm=norm, use_sigmoid=use_sigmoid)
     self.F = Generator('F', self.is_training, norm=norm)

@@ -92,8 +92,9 @@ def Rk(input, k, reuse=False, name=None):
     return relu2
 
 def n_res_blocks(input, reuse, n=6):
+  depth = input.get_shape()[3]
   for i in range(1,n+1):
-    output = Rk(input, 128, reuse, name='R128_{}'.format(i))
+    output = Rk(input, depth, reuse, name='R{}_{}'.format(depth, i))
     input = output
   return output
 

@@ -7,7 +7,7 @@ class Discriminator:
     self.is_training = is_training
     self.norm = norm
     self.reuse = False
-    self.patch_size = 70
+    self.patch_size = patch_size
     self.use_sigmoid = use_sigmoid
 
   def __call__(self, input):

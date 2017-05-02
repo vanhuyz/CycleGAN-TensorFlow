@@ -24,6 +24,8 @@ tf.flags.DEFINE_float('beta1', 0.5,
                       'momentum term of Adam, default: 0.5')
 tf.flags.DEFINE_float('pool_size', 50,
                       'size of image buffer that stores previously generated images, default: 50')
+tf.flags.DEFINE_integer('ngf', 64,
+                        'number of gen filters in first conv layer, default: 64')
 
 tf.flags.DEFINE_string('X', 'data/tfrecords/apple.tfrecords',
                        'X tfrecords file for training, default: data/tfrecords/apple.tfrecords')
@@ -48,7 +50,8 @@ def train():
         lambda1=FLAGS.lambda1,
         lambda2=FLAGS.lambda1,
         learning_rate=FLAGS.learning_rate,
-        beta1=FLAGS.beta1
+        beta1=FLAGS.beta1,
+        ngf=FLAGS.ngf
     )
     G_loss, D_Y_loss, F_loss, D_X_loss, fake_y, fake_x = cycle_gan.model()
     optimizers = cycle_gan.optimize(G_loss, D_Y_loss, F_loss, D_X_loss)
@@ -62,7 +65,6 @@ def train():
 
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-
 
     try:
       step = 0

@@ -19,13 +19,12 @@ def c7s1_k(input, k, reuse=False, norm='instance', activation='relu', is_trainin
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[7, 7, input.get_shape()[3], k])
-    biases = _biases("biases", [k])
 
     padded = tf.pad(input, [[0,0],[3,3],[3,3],[0,0]], 'REFLECT')
     conv = tf.nn.conv2d(padded, weights,
         strides=[1, 1, 1, 1], padding='VALID')
 
-    normalized = _norm(conv+biases, is_training, norm)
+    normalized = _norm(conv, is_training, norm)
 
     if activation == 'relu':
       output = tf.nn.relu(normalized)
@@ -49,11 +48,10 @@ def dk(input, k, reuse=False, norm='instance', is_training=True, name=None):
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[3, 3, input.get_shape()[3], k])
-    biases = _biases("biases", [k])
 
     conv = tf.nn.conv2d(input, weights,
         strides=[1, 2, 2, 1], padding='SAME')
-    normalized = _norm(conv+biases, is_training, norm)
+    normalized = _norm(conv, is_training, norm)
     output = tf.nn.relu(normalized)
     return output
 
@@ -116,14 +114,13 @@ def uk(input, k, reuse=False, norm='instance', is_training=True, name=None):
 
     weights = _weights("weights",
       shape=[3, 3, k, input_shape[3]])
-    biases = _biases("biases", [k])
 
     output_size = input_shape[1]*2
     output_shape = [input_shape[0], output_size, output_size, k]
     fsconv = tf.nn.conv2d_transpose(input, weights,
         output_shape=output_shape,
         strides=[1, 2, 2, 1], padding='SAME')
-    normalized = _norm(fsconv+biases, is_training, norm)
+    normalized = _norm(fsconv, is_training, norm)
     output = tf.nn.relu(normalized)
     return output
 
@@ -145,12 +142,11 @@ def Ck(input, k, slope=0.2, stride=2, reuse=False, norm='instance', is_training=
   with tf.variable_scope(name, reuse=reuse):
     weights = _weights("weights",
       shape=[4, 4, input.get_shape()[3], k])
-    biases = _biases("biases", [k])
 
     conv = tf.nn.conv2d(input, weights,
         strides=[1, stride, stride, 1], padding='SAME')
 
-    normalized = _norm(conv+biases, is_training, norm)
+    normalized = _norm(conv, is_training, norm)
     output = _leaky_relu(normalized, slope)
     return output
 
@@ -215,7 +211,10 @@ def _batch_norm(input, is_training):
   """ Batch Normalization
   """
   with tf.variable_scope("batch_norm"):
-    return tf.contrib.layers.batch_norm(input, decay=0.9, is_training=is_training)
+    return tf.contrib.layers.batch_norm(input,
+                                        decay=0.9,
+                                        updates_collections=None,
+                                        is_training=is_training)
 
 def _instance_norm(input):
   """ Instance Normalization

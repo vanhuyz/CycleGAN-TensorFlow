@@ -5,8 +5,8 @@ NGF = 64
 X = apple
 Y = orange
 
-# for export_graph: default the last directory in checkpoints
-CHECKPOINT_DIR = `ls checkpoints | tail -n 1`
+# for export_graph: default is the lastest checkpoint
+CHECKPOINT_DIR = checkpoints/`ls checkpoints | tail -n 1`
 
 # for reference
 INPUT_IMG = input_sample.jpg
@@ -43,4 +43,4 @@ inference:
                        --image_size=$(IMAGE_SIZE)
 
 tensorboard:
-	tensorboard --logdir checkpoints/`ls checkpoints | tail -n 1`
+	tensorboard --logdir=$(CHECKPOINT_DIR)

@@ -49,7 +49,7 @@ class ImagePool:
       p = random.random()
       if p > 0.5:
         # use old image
-        random_id = random.sample(range(self.pool_size))
+        random_id = random.randrange(0, self.pool_size)
         tmp = self.images[random_id].copy()
         self.images[random_id] = image.copy()
         return tmp

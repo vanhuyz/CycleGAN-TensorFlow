@@ -68,11 +68,12 @@ def train():
 
     try:
       step = 0
+      fake_Y_pool = ImagePool(FLAGS.pool_size)
+      fake_X_pool = ImagePool(FLAGS.pool_size)
+
       while not coord.should_stop():
-        # update previously generated images
+        # get previously generated images
         fake_y_val, fake_x_val = sess.run([fake_y, fake_x])
-        fake_Y_pool = ImagePool(FLAGS.pool_size)
-        fake_X_pool = ImagePool(FLAGS.pool_size)
 
         # train
         _, G_loss_val, D_Y_loss_val, F_loss_val, D_X_loss_val, summary = (

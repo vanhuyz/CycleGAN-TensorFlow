@@ -1,5 +1,5 @@
 """ Freeze variables and convert 2 generator networks to 2 GraphDef files.
-This makes file size smaller and can be use for inference only in production.
+This makes file size smaller and can be used for inference in production.
 An example of command-line usage is:
 python export_graph.py --checkpoint_dir checkpoints/20170424-1152 \
                        --XtoY_model apple2orange.pb \

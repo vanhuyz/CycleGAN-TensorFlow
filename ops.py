@@ -71,7 +71,7 @@ def Rk(input, k, reuse=False, name=None):
     weights1 = _weights("weights1",
       shape=[3, 3, input.get_shape()[3], k])
     biases1 = _biases("biases1", [k])
-    padded1 = tf.pad(input, [[0,0],[2,2],[2,2],[0,0]], 'REFLECT')
+    padded1 = tf.pad(input, [[0,0],[1,1],[1,1],[0,0]], 'REFLECT')
     conv1 = tf.nn.conv2d(padded1, weights1,
         strides=[1, 1, 1, 1], padding='VALID')
     relu1 = tf.nn.relu(conv1+biases1)
@@ -81,12 +81,11 @@ def Rk(input, k, reuse=False, name=None):
       shape=[3, 3, relu1.get_shape()[3], k])
     biases2 = _biases("biases2", [k])
 
-    padded2 = tf.pad(relu1, [[0,0],[2,2],[2,2],[0,0]], 'REFLECT')
+    padded2 = tf.pad(relu1, [[0,0],[1,1],[1,1],[0,0]], 'REFLECT')
     conv2 = tf.nn.conv2d(padded2, weights1,
         strides=[1, 1, 1, 1], padding='VALID')
     res = conv2+biases2
-    shaved = res[:,2:-2,2:-2,:]
-    relu2 = tf.nn.relu(input+shaved)
+    relu2 = tf.nn.relu(input+res)
     return relu2
 
 def n_res_blocks(input, reuse, n=6):
@@ -213,6 +212,7 @@ def _batch_norm(input, is_training):
   with tf.variable_scope("batch_norm"):
     return tf.contrib.layers.batch_norm(input,
                                         decay=0.9,
+                                        scale=True,
                                         updates_collections=None,
                                         is_training=is_training)
 

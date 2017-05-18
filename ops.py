@@ -105,6 +105,7 @@ def uk(input, k, reuse=False, norm='instance', is_training=True, name=None, outp
     is_training: boolean or BoolTensor
     reuse: boolean
     name: string, e.g. 'c7sk-32'
+    output_size: integer, desired output size of layer
   Returns:
     4D tensor
   """

@@ -56,10 +56,10 @@ $ python3 train.py  \
 Here is the list of arguments:
 ```
 usage: train.py [-h] [--batch_size BATCH_SIZE] [--image_size IMAGE_SIZE]
-                [--use_lsgan [USE_LSGAN]] [--nouse_lsgan] [--norm NORM]
-                [--lambda1 LAMBDA1] [--lambda2 LAMBDA2]
+                [--use_lsgan [USE_LSGAN]] [--nouse_lsgan]
+                [--norm NORM] [--lambda1 LAMBDA1] [--lambda2 LAMBDA2]
                 [--learning_rate LEARNING_RATE] [--beta1 BETA1]
-                [--pool_size POOL_SIZE] [--X X] [--Y Y]
+                [--pool_size POOL_SIZE] [--ngf NGF] [--X X] [--Y Y]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -67,7 +67,6 @@ optional arguments:
                         batch size, default: 1
   --image_size IMAGE_SIZE
                         image size, default: 256
-
   --use_lsgan [USE_LSGAN]
                         use lsgan (mean squared error) or cross entropy loss,
                         default: True
@@ -75,7 +74,8 @@ optional arguments:
   --norm NORM           [instance, batch] use instance norm or batch norm,
                         default: instance
   --lambda1 LAMBDA1     weight for forward cycle loss (X->Y->X), default: 10.0
-  --lambda2 LAMBDA2     weight for backward cycle loss (Y->X->Y), default: 10.0
+  --lambda2 LAMBDA2     weight for backward cycle loss (Y->X->Y), default:
+                        10.0
   --learning_rate LEARNING_RATE
                         initial learning rate for Adam, default: 0.0002
   --beta1 BETA1         momentum term of Adam, default: 0.5
@@ -83,12 +83,10 @@ optional arguments:
                         size of image buffer that stores previously generated
                         images, default: 50
   --ngf NGF             number of gen filters in first conv layer, default: 64
-  --X X
-                        X tfrecords file for training,
-                        default: data/tfrecords/apple.tfrecords
-  --Y Y
-                        Y tfrecords file for training,
-                        default: data/tfrecords/orange.tfrecords
+  --X X                 X tfrecords file for training, default:
+                        data/tfrecords/apple.tfrecords
+  --Y Y                 Y tfrecords file for training, default:
+                        data/tfrecords/orange.tfrecords
 ```
 
 Check TensorBoard to see training progress and generated images.

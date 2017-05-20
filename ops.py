@@ -55,7 +55,7 @@ def dk(input, k, reuse=False, norm='instance', is_training=True, name=None):
     output = tf.nn.relu(normalized)
     return output
 
-def Rk(input, k, reuse=False, name=None):
+def Rk(input, k,  reuse=False, norm='instance', is_training=True, name=None):
   """ A residual block that contains two 3x3 convolutional layers
       with the same number of filters on both layer
   Args:
@@ -67,31 +67,30 @@ def Rk(input, k, reuse=False, name=None):
     4D tensor (same shape as input)
   """
   with tf.variable_scope(name, reuse=reuse):
-    # layer 1
-    weights1 = _weights("weights1",
-      shape=[3, 3, input.get_shape()[3], k])
-    biases1 = _biases("biases1", [k])
-    padded1 = tf.pad(input, [[0,0],[1,1],[1,1],[0,0]], 'REFLECT')
-    conv1 = tf.nn.conv2d(padded1, weights1,
-        strides=[1, 1, 1, 1], padding='VALID')
-    relu1 = tf.nn.relu(conv1+biases1)
+    with tf.variable_scope('layer1', reuse=reuse):
+      weights1 = _weights("weights1",
+        shape=[3, 3, input.get_shape()[3], k])
+      padded1 = tf.pad(input, [[0,0],[1,1],[1,1],[0,0]], 'REFLECT')
+      conv1 = tf.nn.conv2d(padded1, weights1,
+          strides=[1, 1, 1, 1], padding='VALID')
+      normalized1 = _norm(conv1, is_training, norm)
+      relu1 = tf.nn.relu(normalized1)
 
-    # layer 2
-    weights2 = _weights("weights2",
-      shape=[3, 3, relu1.get_shape()[3], k])
-    biases2 = _biases("biases2", [k])
+    with tf.variable_scope('layer2', reuse=reuse):
+      weights2 = _weights("weights2",
+        shape=[3, 3, relu1.get_shape()[3], k])
 
-    padded2 = tf.pad(relu1, [[0,0],[1,1],[1,1],[0,0]], 'REFLECT')
-    conv2 = tf.nn.conv2d(padded2, weights1,
-        strides=[1, 1, 1, 1], padding='VALID')
-    res = conv2+biases2
-    relu2 = tf.nn.relu(input+res)
-    return relu2
+      padded2 = tf.pad(relu1, [[0,0],[1,1],[1,1],[0,0]], 'REFLECT')
+      conv2 = tf.nn.conv2d(padded2, weights1,
+          strides=[1, 1, 1, 1], padding='VALID')
+      normalized2 = _norm(conv2, is_training, norm)
+    output = input+normalized2
+    return output
 
-def n_res_blocks(input, reuse, n=6):
+def n_res_blocks(input, reuse, norm='instance', is_training=True, n=6):
   depth = input.get_shape()[3]
   for i in range(1,n+1):
-    output = Rk(input, depth, reuse, name='R{}_{}'.format(depth, i))
+    output = Rk(input, depth, reuse, norm, is_training, 'R{}_{}'.format(depth, i))
     input = output
   return output
 

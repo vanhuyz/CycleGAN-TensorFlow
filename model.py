@@ -14,7 +14,6 @@ class CycleGAN:
                batch_size=1,
                image_size=256,
                use_lsgan=True,
-               use_patchgan=False,
                norm='instance',
                lambda1=10.0,
                lambda2=10.0,
@@ -31,7 +30,6 @@ class CycleGAN:
       lambda1: integer, weight for forward cycle loss (X->Y->X)
       lambda2: integer, weight for backward cycle loss (Y->X->Y)
       use_lsgan: boolean
-      use_patchgan: boolean
       norm: 'instance' or 'batch'
       learning_rate: float, initial learning rate for Adam
       beta1: float, momentum term of Adam
@@ -52,10 +50,10 @@ class CycleGAN:
 
     self.G = Generator('G', self.is_training, ngf=ngf, norm=norm, image_size=image_size)
     self.D_Y = Discriminator('D_Y',
-        self.is_training, norm=norm, use_patchgan=use_patchgan, use_sigmoid=use_sigmoid)
+        self.is_training, norm=norm, use_sigmoid=use_sigmoid)
     self.F = Generator('F', self.is_training, norm=norm)
     self.D_X = Discriminator('D_X',
-        self.is_training, norm=norm, use_patchgan=use_patchgan, use_sigmoid=use_sigmoid)
+        self.is_training, norm=norm, use_sigmoid=use_sigmoid)
 
     self.fake_x = tf.placeholder(tf.float32,
         shape=[batch_size, image_size, image_size, 3])

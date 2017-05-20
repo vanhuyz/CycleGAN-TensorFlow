@@ -57,7 +57,6 @@ Here is the list of arguments:
 ```
 usage: train.py [-h] [--batch_size BATCH_SIZE] [--image_size IMAGE_SIZE]
                 [--use_lsgan [USE_LSGAN]] [--nouse_lsgan]
-                [--use_patchgan [USE_PATCHGAN]] [--nouse_patchgan]
                 [--norm NORM] [--lambda1 LAMBDA1] [--lambda2 LAMBDA2]
                 [--learning_rate LEARNING_RATE] [--beta1 BETA1]
                 [--pool_size POOL_SIZE] [--ngf NGF] [--X X] [--Y Y]
@@ -72,9 +71,6 @@ optional arguments:
                         use lsgan (mean squared error) or cross entropy loss,
                         default: True
   --nouse_lsgan
-  --use_patchgan [USE_PATCHGAN]
-                        random crop input of Discriminator, default: False
-  --nouse_patchgan
   --norm NORM           [instance, batch] use instance norm or batch norm,
                         default: instance
   --lambda1 LAMBDA1     weight for forward cycle loss (X->Y->X), default: 10.0

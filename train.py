@@ -12,8 +12,6 @@ tf.flags.DEFINE_integer('batch_size', 1, 'batch size, default: 1')
 tf.flags.DEFINE_integer('image_size', 256, 'image size, default: 256')
 tf.flags.DEFINE_bool('use_lsgan', True,
                      'use lsgan (mean squared error) or cross entropy loss, default: True')
-tf.flags.DEFINE_bool('use_patchgan', False,
-                     'random crop input of Discriminator, default: False')
 tf.flags.DEFINE_string('norm', 'instance',
                        '[instance, batch] use instance norm or batch norm, default: instance')
 tf.flags.DEFINE_integer('lambda1', 10.0,

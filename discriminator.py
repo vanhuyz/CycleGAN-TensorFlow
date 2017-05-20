@@ -2,13 +2,11 @@ import tensorflow as tf
 import ops
 
 class Discriminator:
-  def __init__(self, name, is_training, norm='instance', use_patchgan=False, patch_size=70, use_sigmoid=False):
+  def __init__(self, name, is_training, norm='instance', use_sigmoid=False):
     self.name = name
     self.is_training = is_training
     self.norm = norm
     self.reuse = False
-    self.use_patchgan = use_patchgan
-    self.patch_size = patch_size
     self.use_sigmoid = use_sigmoid
 
   def __call__(self, input):
@@ -20,11 +18,6 @@ class Discriminator:
               filled with 0.9 if real, 0.0 if fake
     """
     with tf.variable_scope(self.name):
-      if self.use_patchgan:
-        batch_size = input.get_shape().as_list()[0]
-        input = tf.random_crop(input,
-            [batch_size, self.patch_size, self.patch_size, 3])  # (?, 70, 70, 3)
-
       # convolution layers
       C64 = ops.Ck(input, 64, reuse=self.reuse, norm=None,
           is_training=self.is_training, name='C64')             # (?, w/2, h/2, 64)

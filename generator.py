@@ -38,7 +38,7 @@ class Generator:
       u64 = ops.uk(res_output, 2*self.ngf, is_training=self.is_training, norm=self.norm,
           reuse=self.reuse, name='u64')                                 # (?, w/2, h/2, 64)
       u32 = ops.uk(u64, self.ngf, is_training=self.is_training, norm=self.norm,
-          reuse=self.reuse, name='u32')                                 # (?, w, h, 32)
+          reuse=self.reuse, name='u32', output_size=self.image_size)         # (?, w, h, 32)
 
       # conv layer
       # Note: the paper said that ReLU and _norm were used

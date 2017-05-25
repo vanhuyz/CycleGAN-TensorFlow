@@ -171,7 +171,7 @@ class CycleGAN:
       loss = -tf.reduce_mean(ops.safe_log(D(fake_y))) / 2
     return loss
 
-  def cycle_consistency_loss(self, F, G, x, y):
+  def cycle_consistency_loss(self, G, F, x, y):
     """ cycle consistency loss (L1 norm)
     """
     forward_loss = tf.reduce_mean(tf.abs(F(G(x))-x))

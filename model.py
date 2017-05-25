@@ -70,6 +70,7 @@ class CycleGAN:
     y = Y_reader.feed()
 
     cycle_loss = self.cycle_consistency_loss(self.G, self.F, x, y)
+    idt_loss = self.identity_loss(self.G, self.F, x, y)
 
     # X -> Y
     fake_y = self.G(x)
@@ -171,10 +172,17 @@ class CycleGAN:
       loss = -tf.reduce_mean(ops.safe_log(D(fake_y))) / 2
     return loss
 
-  def cycle_consistency_loss(self, F, G, x, y):
+  def cycle_consistency_loss(self, G, F, x, y):
     """ cycle consistency loss (L1 norm)
     """
     forward_loss = tf.reduce_mean(tf.abs(F(G(x))-x))
     backward_loss = tf.reduce_mean(tf.abs(G(F(y))-y))
     loss = self.lambda1*forward_loss + self.lambda2*backward_loss
     return loss
+
+  def identity_loss(self, G, F, x, y):
+    """ identity mapping loss
+    """
+    g_loss = tf.reduce_mean(tf.abs(G(y)-y))
+    f_loss = tf.reduce_mean(tf.abs(F(x)-x))
+    return g_loss + f_loss

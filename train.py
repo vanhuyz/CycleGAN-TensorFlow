@@ -36,7 +36,10 @@ tf.flags.DEFINE_string('Y', 'data/tfrecords/orange.tfrecords',
 def train():
   current_time = datetime.now().strftime("%Y%m%d-%H%M")
   checkpoints_dir = "checkpoints/{}".format(current_time)
-  os.makedirs(checkpoints_dir, exist_ok=True)
+  try:
+    os.makedirs(checkpoints_dir)
+  except os.error, e:
+    pass
 
   graph = tf.Graph()
   with graph.as_default():

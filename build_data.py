@@ -1,6 +1,13 @@
 import tensorflow as tf
-import os
 import random
+import os
+
+try:
+  from os import scandir
+except ImportError:
+  # Python 2 polyfill module
+  from scandir import scandir
+    
 
 FLAGS = tf.flags.FLAGS
 
@@ -23,7 +30,7 @@ def data_reader(input_dir, shuffle=True):
   """
   file_paths = []
 
-  for img_file in os.scandir(input_dir):
+  for img_file in scandir(input_dir):
     if img_file.name.endswith('.jpg') and img_file.is_file():
       file_paths.append(img_file.path)
 
@@ -75,7 +82,10 @@ def data_writer(input_dir, output_file):
 
   # create tfrecords dir if not exists
   output_dir = os.path.dirname(output_file)
-  os.makedirs(output_dir, exist_ok=True)
+  try:
+    os.makedirs(output_dir)
+  except os.error, e:
+    pass
 
   images_num = len(file_paths)
 

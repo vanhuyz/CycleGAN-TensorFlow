@@ -31,15 +31,20 @@ tf.flags.DEFINE_string('X', 'data/tfrecords/apple.tfrecords',
                        'X tfrecords file for training, default: data/tfrecords/apple.tfrecords')
 tf.flags.DEFINE_string('Y', 'data/tfrecords/orange.tfrecords',
                        'Y tfrecords file for training, default: data/tfrecords/orange.tfrecords')
+tf.flags.DEFINE_string('load_model', None,
+                        'folder of saved model that you wish to continue training (e.g. 20170602-1936), default: None')
 
 
 def train():
-  current_time = datetime.now().strftime("%Y%m%d-%H%M")
-  checkpoints_dir = "checkpoints/{}".format(current_time)
-  try:
-    os.makedirs(checkpoints_dir)
-  except os.error, e:
-    pass
+  if FLAGS.load_model is not None:
+    checkpoints_dir = "checkpoints/" + FLAGS.load_model
+  else:
+    current_time = datetime.now().strftime("%Y%m%d-%H%M")
+    checkpoints_dir = "checkpoints/{}".format(current_time)
+    try:
+      os.makedirs(checkpoints_dir)
+    except os.error:
+      pass
 
   graph = tf.Graph()
   with graph.as_default():
@@ -64,7 +69,13 @@ def train():
     saver = tf.train.Saver()
 
   with tf.Session(graph=graph) as sess:
-    sess.run(tf.global_variables_initializer())
+    if FLAGS.load_model is not None:
+      checkpoint = tf.train.get_checkpoint_state(checkpoints_dir)
+      meta_graph_path = checkpoint.model_checkpoint_path + ".meta"
+      restore = tf.train.import_meta_graph(meta_graph_path)
+      restore.restore(sess, tf.train.latest_checkpoint(checkpoints_dir))
+    else:
+      sess.run(tf.global_variables_initializer())
 
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)

@@ -74,14 +74,15 @@ def train():
       meta_graph_path = checkpoint.model_checkpoint_path + ".meta"
       restore = tf.train.import_meta_graph(meta_graph_path)
       restore.restore(sess, tf.train.latest_checkpoint(checkpoints_dir))
+      step = int(meta_graph_path.split("-")[2].split(".")[0])
     else:
       sess.run(tf.global_variables_initializer())
+      step = 0
 
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
     try:
-      step = 0
       fake_Y_pool = ImagePool(FLAGS.pool_size)
       fake_X_pool = ImagePool(FLAGS.pool_size)
 

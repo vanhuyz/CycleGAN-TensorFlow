@@ -81,7 +81,7 @@ def Rk(input, k,  reuse=False, norm='instance', is_training=True, name=None):
         shape=[3, 3, relu1.get_shape()[3], k])
 
       padded2 = tf.pad(relu1, [[0,0],[1,1],[1,1],[0,0]], 'REFLECT')
-      conv2 = tf.nn.conv2d(padded2, weights1,
+      conv2 = tf.nn.conv2d(padded2, weights2,
           strides=[1, 1, 1, 1], padding='VALID')
       normalized2 = _norm(conv2, is_training, norm)
     output = input+normalized2

@@ -56,7 +56,7 @@ def train():
         use_lsgan=FLAGS.use_lsgan,
         norm=FLAGS.norm,
         lambda1=FLAGS.lambda1,
-        lambda2=FLAGS.lambda1,
+        lambda2=FLAGS.lambda2,
         learning_rate=FLAGS.learning_rate,
         beta1=FLAGS.beta1,
         ngf=FLAGS.ngf

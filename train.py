@@ -37,7 +37,7 @@ tf.flags.DEFINE_string('load_model', None,
 
 def train():
   if FLAGS.load_model is not None:
-    checkpoints_dir = "checkpoints/" + FLAGS.load_model
+    checkpoints_dir = "checkpoints/" + FLAGS.load_model.lstrip("checkpoints/")
   else:
     current_time = datetime.now().strftime("%Y%m%d-%H%M")
     checkpoints_dir = "checkpoints/{}".format(current_time)

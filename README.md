@@ -60,6 +60,7 @@ usage: train.py [-h] [--batch_size BATCH_SIZE] [--image_size IMAGE_SIZE]
                 [--norm NORM] [--lambda1 LAMBDA1] [--lambda2 LAMBDA2]
                 [--learning_rate LEARNING_RATE] [--beta1 BETA1]
                 [--pool_size POOL_SIZE] [--ngf NGF] [--X X] [--Y Y]
+                [--load_model LOAD_MODEL]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -87,12 +88,22 @@ optional arguments:
                         data/tfrecords/apple.tfrecords
   --Y Y                 Y tfrecords file for training, default:
                         data/tfrecords/orange.tfrecords
+  --load_model LOAD_MODEL
+                        folder of saved model that you wish to continue
+                        training (e.g. 20170602-1936), default: None
 ```
 
 Check TensorBoard to see training progress and generated images.
 
 ```
 $ tensorboard --logdir checkpoints/${datetime}
+```
+
+If you halted the training process and want to continue training, then you can set the `load_model` parameter like this.
+
+```bash
+$ python3 train.py  \
+    --load_model 20170602-1936
 ```
 
 Here are some funny screenshots from TensorBoard when training orange -> apple:

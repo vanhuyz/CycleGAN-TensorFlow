@@ -1,26 +1,27 @@
 import tensorflow as tf
 import random
 
-def convert2int(image):
-  """ Transfrom from float tensor ([-1.,1.]) to int image ([0,255])
-  """
-  return tf.image.convert_image_dtype((image+1.0)/2.0, tf.uint8)
+# def convert2int(image):
+#   """ Transfrom from float tensor ([-1.,1.]) to int image ([0.,1.])
+#   """
+#   return tf.image.convert_image_dtype((image+1.0)/2.0, tf.float32)
+#   # return (image+1.0)/2.0
 
 def convert2float(image):
   """ Transfrom from int image ([0,255]) to float tensor ([-1.,1.])
   """
-  image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+  image = tf.image.convert_image_dtype(image, dtype=tf.float32) # output is [0.,1.]
   # return (image/127.5) - 1.0
-  return image * 2.0 - 1.0
+  return image*2.0 - 1.0
 
-def batch_convert2int(images):
-  """
-  Args:
-    images: 4D float tensor (batch_size, image_size, image_size, depth)
-  Returns:
-    4D int tensor
-  """
-  return tf.map_fn(convert2int, images, dtype=tf.uint8)
+# def batch_convert2int(images):
+#   """
+#   Args:
+#     images: 4D float tensor (batch_size, image_size, image_size, depth)
+#   Returns:
+#     4D int tensor
+#   """
+#   return tf.map_fn(convert2int, images, dtype=tf.uint8)
 
 def batch_convert2float(images):
   """
@@ -56,4 +57,3 @@ class ImagePool:
         return tmp
       else:
         return image
-

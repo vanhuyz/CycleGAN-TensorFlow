@@ -49,8 +49,8 @@ class Reader():
     return images
 
   def _preprocess(self, image):
-    image = tf.image.resize_images(image, size=(self.image_size, self.image_size))
     image = utils.convert2float(image)
+    image = tf.image.resize_images(image, size=(self.image_size, self.image_size))
     image.set_shape([self.image_size, self.image_size, 3])
     return image
 

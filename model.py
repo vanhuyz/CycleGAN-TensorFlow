@@ -15,8 +15,8 @@ class CycleGAN:
                image_size=256,
                use_lsgan=True,
                norm='instance',
-               lambda1=10.0,
-               lambda2=10.0,
+               lambda1=10,
+               lambda2=10,
                learning_rate=2e-4,
                beta1=0.5,
                ngf=64

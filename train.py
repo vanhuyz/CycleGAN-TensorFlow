@@ -14,10 +14,10 @@ tf.flags.DEFINE_bool('use_lsgan', True,
                      'use lsgan (mean squared error) or cross entropy loss, default: True')
 tf.flags.DEFINE_string('norm', 'instance',
                        '[instance, batch] use instance norm or batch norm, default: instance')
-tf.flags.DEFINE_integer('lambda1', 10.0,
-                        'weight for forward cycle loss (X->Y->X), default: 10.0')
-tf.flags.DEFINE_integer('lambda2', 10.0,
-                        'weight for backward cycle loss (Y->X->Y), default: 10.0')
+tf.flags.DEFINE_integer('lambda1', 10,
+                        'weight for forward cycle loss (X->Y->X), default: 10')
+tf.flags.DEFINE_integer('lambda2', 10,
+                        'weight for backward cycle loss (Y->X->Y), default: 10')
 tf.flags.DEFINE_float('learning_rate', 2e-4,
                       'initial learning rate for Adam, default: 0.0002')
 tf.flags.DEFINE_float('beta1', 0.5,

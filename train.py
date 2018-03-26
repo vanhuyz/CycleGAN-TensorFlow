@@ -86,11 +86,11 @@ def train():
       fake_Y_pool = ImagePool(FLAGS.pool_size)
       fake_X_pool = ImagePool(FLAGS.pool_size)
 
-      while not coord.should_stop():
-        # get previously generated images
-        fake_y_val, fake_x_val = sess.run([fake_y, fake_x])
+      # get previously generated images
+      fake_y_val, fake_x_val = sess.run([fake_y, fake_x])
 
-        # train
+      # train
+      while not coord.should_stop():
         _, G_loss_val, D_Y_loss_val, F_loss_val, D_X_loss_val, summary = (
               sess.run(
                   [optimizers, G_loss, D_Y_loss, F_loss, D_X_loss, summary_op],

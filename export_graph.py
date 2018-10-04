@@ -39,7 +39,6 @@ def export_graph(model_name, XtoY=True):
 
         output_image = tf.identity(output_image, name='output_image')
         restore_saver = tf.train.Saver()
-        export_saver = tf.train.Saver()
 
     with tf.Session(graph=graph) as sess:
         sess.run(tf.global_variables_initializer())

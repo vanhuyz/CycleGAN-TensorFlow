@@ -7,8 +7,6 @@ python export_graph.py --model pretrained/apple2orange.pb \
 """
 
 import tensorflow as tf
-import os
-from model import CycleGAN
 import utils
 
 FLAGS = tf.flags.FLAGS

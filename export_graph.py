@@ -8,10 +8,7 @@ python export_graph.py --checkpoint_dir checkpoints/20170424-1152 \
 """
 
 import tensorflow as tf
-import os
-from tensorflow.python.tools.freeze_graph import freeze_graph
 from model import CycleGAN
-import utils
 
 FLAGS = tf.flags.FLAGS
 

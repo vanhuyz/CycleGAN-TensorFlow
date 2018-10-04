@@ -28,7 +28,7 @@ Original paper: https://arxiv.org/abs/1703.10593
 * First, download a dataset, e.g. apple2orange
 
 ```bash
-$ bash download_dataset.sh apple2orange
+$ ./download_dataset.sh apple2orange
 ```
 
 * Write the dataset to tfrecords

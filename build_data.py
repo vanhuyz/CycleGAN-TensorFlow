@@ -83,7 +83,7 @@ def data_writer(input_dir, output_file):
     output_dir = os.path.dirname(output_file)
     try:
         os.makedirs(output_dir)
-    except os.error as e:
+    except os.error:
         pass
 
     images_num = len(file_paths)

@@ -44,13 +44,12 @@ class ImagePool:
         if len(self.images) < self.pool_size:
             self.images.append(image)
             return image
-        else:
-            p = random.random()
-            if p > 0.5:
-                # use old image
-                random_id = random.randrange(0, self.pool_size)
-                tmp = self.images[random_id].copy()
-                self.images[random_id] = image.copy()
-                return tmp
-            else:
-                return image
+
+        p = random.random()
+        if p > 0.5:
+            # use old image
+            random_id = random.randrange(0, self.pool_size)
+            tmp = self.images[random_id].copy()
+            self.images[random_id] = image.copy()
+            return tmp
+        return image

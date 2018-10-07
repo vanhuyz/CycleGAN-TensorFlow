@@ -27,7 +27,6 @@ class Reader():
         """
         with tf.name_scope(self.name):
             filename_queue = tf.train.string_input_producer([self.tfrecords_file])
-            reader = tf.TFRecordReader()
 
             _, serialized_example = self.reader.read(filename_queue)
             img_features = {

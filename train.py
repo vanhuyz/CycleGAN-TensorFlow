@@ -78,14 +78,10 @@ tf.flags.DEFINE_string(
 
 def train():
     if FLAGS.load_model is not None:
-        checkpoints_dir = "checkpoints/" + FLAGS.load_model.lstrip("checkpoints/")
+        chp_dir = "checkpoints/" + FLAGS.load_model.lstrip("checkpoints/")
     else:
-        current_time = datetime.now().strftime("%Y%m%d-%H%M")
-        checkpoints_dir = "checkpoints/{}".format(current_time)
-        try:
-            os.makedirs(checkpoints_dir)
-        except os.error:
-            pass
+        chp_dir = "checkpoints/" + datetime.now().strftime("%Y%m%d-%H%M")
+        os.makedirs(chp_dir)
 
     graph = tf.Graph()
     with graph.as_default():
@@ -106,15 +102,15 @@ def train():
         optimizers = cycle_gan.optimize(G_loss, D_Y_loss, F_loss, D_X_loss)
 
         summary_op = tf.summary.merge_all()
-        train_writer = tf.summary.FileWriter(checkpoints_dir, graph)
+        train_writer = tf.summary.FileWriter(chp_dir, graph)
         saver = tf.train.Saver()
 
     with tf.Session(graph=graph) as sess:
         if FLAGS.load_model is not None:
-            checkpoint = tf.train.get_checkpoint_state(checkpoints_dir)
+            checkpoint = tf.train.get_checkpoint_state(chp_dir)
             meta_graph_path = checkpoint.model_checkpoint_path + ".meta"
             restore = tf.train.import_meta_graph(meta_graph_path)
-            restore.restore(sess, tf.train.latest_checkpoint(checkpoints_dir))
+            restore.restore(sess, tf.train.latest_checkpoint(chp_dir))
             step = int(meta_graph_path.split("-")[2].split(".")[0])
         else:
             sess.run(tf.global_variables_initializer())
@@ -151,7 +147,7 @@ def train():
                     logging.info('  D_X_loss : {}'.format(D_X_loss_val))
 
                 if step % 10000 == 0:
-                    save_path = saver.save(sess, checkpoints_dir + "/model.ckpt", global_step=step)
+                    save_path = saver.save(sess, chp_dir + "/model.ckpt", global_step=step)
                     logging.info("Model saved in file: %s" % save_path)
 
                 step += 1
@@ -162,7 +158,7 @@ def train():
         except Exception as e:
             coord.request_stop(e)
         finally:
-            save_path = saver.save(sess, checkpoints_dir + "/model.ckpt", global_step=step)
+            save_path = saver.save(sess, chp_dir + "/model.ckpt", global_step=step)
             logging.info("Model saved in file: %s" % save_path)
             # When done, ask the threads to stop.
             coord.request_stop()

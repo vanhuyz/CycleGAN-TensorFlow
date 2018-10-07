@@ -53,23 +53,48 @@ class Generator:
 
             if self.image_size <= 128:
                 # use 6 residual blocks for 128x128 images
-                res_output = ops.n_res_blocks(d128, reuse=self.reuse, n=6)      # (?, w/4, h/4, 128)
+                # (?, w/4, h/4, 128)
+                res_output = ops.n_res_blocks(d128, reuse=self.reuse, n=6)
             else:
                 # 9 blocks for higher resolution
-                res_output = ops.n_res_blocks(d128, reuse=self.reuse, n=9)      # (?, w/4, h/4, 128)
+                # (?, w/4, h/4, 128)
+                res_output = ops.n_res_blocks(d128, reuse=self.reuse, n=9)
 
             # fractional-strided convolution
-            u64 = ops.uk(res_output, 2*self.ngf, is_training=self.is_training, norm=self.norm,
-                reuse=self.reuse, name='u64')                                 # (?, w/2, h/2, 64)
-            u32 = ops.uk(u64, self.ngf, is_training=self.is_training, norm=self.norm,
-            reuse=self.reuse, name='u32', output_size=self.image_size)         # (?, w, h, 32)
+            # (?, w/2, h/2, 64)
+            u64 = ops.uk(
+                res_output,
+                2*self.ngf,
+                is_training=self.is_training,
+                norm=self.norm,
+                reuse=self.reuse,
+                name='u64'
+            )
+
+            # (?, w, h, 32)
+            u32 = ops.uk(
+                u64,
+                self.ngf,
+                is_training=self.is_training,
+                norm=self.norm,
+                reuse=self.reuse,
+                name='u32',
+                output_size=self.image_size
+            )
 
             # conv layer
             # Note: the paper said that ReLU and _norm were used
             # but actually tanh was used and no _norm here
-            output = ops.c7s1_k(u32, 3, norm=None,
-                activation='tanh', reuse=self.reuse, name='output')           # (?, w, h, 3)
-        # set reuse=True for next call
+            # (?, w, h, 3)
+            output = ops.c7s1_k(
+                u32,
+                3,
+                norm=None,
+                activation='tanh',
+                reuse=self.reuse,
+                name='output'
+            )
+
         self.reuse = True
         self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
 

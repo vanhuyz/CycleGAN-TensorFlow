@@ -10,31 +10,71 @@ from utils import ImagePool
 
 FLAGS = tf.flags.FLAGS
 
-tf.flags.DEFINE_integer('batch_size', 1, 'batch size, default: 1')
-tf.flags.DEFINE_integer('image_size', 256, 'image size, default: 256')
-tf.flags.DEFINE_bool('use_lsgan', True,
-                     'use lsgan (mean squared error) or cross entropy loss, default: True')
-tf.flags.DEFINE_string('norm', 'instance',
-                       '[instance, batch] use instance norm or batch norm, default: instance')
-tf.flags.DEFINE_integer('lambda1', 10,
-                        'weight for forward cycle loss (X->Y->X), default: 10')
-tf.flags.DEFINE_integer('lambda2', 10,
-                        'weight for backward cycle loss (Y->X->Y), default: 10')
-tf.flags.DEFINE_float('learning_rate', 2e-4,
-                      'initial learning rate for Adam, default: 0.0002')
-tf.flags.DEFINE_float('beta1', 0.5,
-                      'momentum term of Adam, default: 0.5')
-tf.flags.DEFINE_float('pool_size', 50,
-                      'size of image buffer that stores previously generated images, default: 50')
-tf.flags.DEFINE_integer('ngf', 64,
-                        'number of gen filters in first conv layer, default: 64')
-
-tf.flags.DEFINE_string('X', 'data/tfrecords/apple.tfrecords',
-                       'X tfrecords file for training, default: data/tfrecords/apple.tfrecords')
-tf.flags.DEFINE_string('Y', 'data/tfrecords/orange.tfrecords',
-                       'Y tfrecords file for training, default: data/tfrecords/orange.tfrecords')
-tf.flags.DEFINE_string('load_model', None,
-                       'folder of saved model that you wish to continue training (e.g. 20170602-1936), default: None')
+tf.flags.DEFINE_integer(
+    'batch_size', 1,
+    'batch size, '
+    'default: 1'
+)
+tf.flags.DEFINE_integer(
+    'image_size', 256,
+    'image size, '
+    'default: 256'
+)
+tf.flags.DEFINE_bool(
+    'use_lsgan', True,
+    'use mean squared error or cross entropy loss, '
+    'default: True'
+)
+tf.flags.DEFINE_string(
+    'norm', 'instance',
+    'use instance norm or batch norm, '
+    'default: instance'
+)
+tf.flags.DEFINE_integer(
+    'lambda1', 10,
+    'weight for forward cycle loss (X->Y->X), '
+    'default: 10'
+)
+tf.flags.DEFINE_integer(
+    'lambda2', 10,
+    'weight for backward cycle loss (Y->X->Y), '
+    'default: 10'
+)
+tf.flags.DEFINE_float(
+    'learning_rate', 2e-4,
+    'initial learning rate for Adam, '
+    'default: 0.0002'
+)
+tf.flags.DEFINE_float(
+    'beta1', 0.5,
+    'momentum term of Adam, '
+    'default: 0.5'
+)
+tf.flags.DEFINE_float(
+    'pool_size', 50,
+    'size of image buffer (store previously generated images), '
+    'default: 50'
+)
+tf.flags.DEFINE_integer(
+    'ngf', 64,
+    'number of gen filters in first conv layer, '
+    'default: 64'
+)
+tf.flags.DEFINE_string(
+    'X', 'data/tfrecords/apple.tfrecords',
+    'X tfrecords file for training, '
+    'default: data/tfrecords/apple.tfrecords'
+)
+tf.flags.DEFINE_string(
+    'Y', 'data/tfrecords/orange.tfrecords',
+    'Y tfrecords file for training, '
+    'default: data/tfrecords/orange.tfrecords'
+)
+tf.flags.DEFINE_string(
+    'load_model', None,
+    'folder of saved model that you wish to continue training, '
+    'default: None'
+)
 
 
 def train():

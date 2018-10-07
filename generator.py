@@ -10,6 +10,7 @@ class Generator:
         self.norm = norm
         self.is_training = is_training
         self.image_size = image_size
+        self.variables = None
 
     def __call__(self, input):
         """

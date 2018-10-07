@@ -20,12 +20,36 @@ class Generator:
         """
         with tf.variable_scope(self.name):
             # conv layers
-            c7s1_32 = ops.c7s1_k(input, self.ngf, is_training=self.is_training, norm=self.norm,
-                reuse=self.reuse, name='c7s1_32')                             # (?, w, h, 32)
-            d64 = ops.dk(c7s1_32, 2*self.ngf, is_training=self.is_training, norm=self.norm,
-                reuse=self.reuse, name='d64')                                 # (?, w/2, h/2, 64)
-            d128 = ops.dk(d64, 4*self.ngf, is_training=self.is_training, norm=self.norm,
-                reuse=self.reuse, name='d128')                                # (?, w/4, h/4, 128)
+
+            # (?, w, h, 32)
+            c7s1_32 = ops.c7s1_k(
+                input,
+                self.ngf,
+                is_training=self.is_training,
+                norm=self.norm,
+                reuse=self.reuse,
+                name='c7s1_32'
+            )
+
+            # (?, w/2, h/2, 64)
+            d64 = ops.dk(
+                c7s1_32,
+                2*self.ngf,
+                is_training=self.is_training,
+                norm=self.norm,
+                reuse=self.reuse,
+                name='d64'
+            )
+
+            # (?, w/4, h/4, 128)
+            d128 = ops.dk(
+                d64,
+                4*self.ngf,
+                is_training=self.is_training,
+                norm=self.norm,
+                reuse=self.reuse,
+                name='d128'
+            )
 
             if self.image_size <= 128:
                 # use 6 residual blocks for 128x128 images

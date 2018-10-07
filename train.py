@@ -1,9 +1,11 @@
+import os
+import logging
+
 import tensorflow as tf
+
 from model import CycleGAN
 from reader import Reader
 from datetime import datetime
-import os
-import logging
 from utils import ImagePool
 
 FLAGS = tf.flags.FLAGS

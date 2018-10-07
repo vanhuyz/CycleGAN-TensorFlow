@@ -38,7 +38,7 @@ export_graph:
 
 inference:
 	python3 inference.py --model=$(MODEL)\
-                             --input=$(INPUT_IMG) \
+                             --input=data/$(INPUT_IMG) \
                              --output=$(OUTPUT_IMG) \
                              --image_size=$(IMAGE_SIZE)
 

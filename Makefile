@@ -5,14 +5,14 @@ NGF = 64
 #X = apple
 #Y = orange
 
-#X = horse
-#Y = zebra
+X = horse
+Y = zebra
 
 # X = cezanne
 # Y = photo
 
-X = summer
-Y = winter_yosemite
+# X = summer
+# Y = winter_yosemite
 
 # for export_graph: default is the lastest checkpoint
 CHECKPOINT_DIR = checkpoints/`ls checkpoints | tail -n 1`

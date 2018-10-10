@@ -2,8 +2,17 @@
 BATCH_SIZE = 1
 IMAGE_SIZE = 256
 NGF = 64
-X = apple
-Y = orange
+#X = apple
+#Y = orange
+
+X = horse
+Y = zebra
+
+# X = cezanne
+# Y = photo
+
+# X = summer
+# Y = winter_yosemite
 
 # for export_graph: default is the lastest checkpoint
 CHECKPOINT_DIR = checkpoints/`ls checkpoints | tail -n 1`

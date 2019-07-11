@@ -51,7 +51,7 @@ class CycleGAN:
     self.G = Generator('G', self.is_training, ngf=ngf, norm=norm, image_size=image_size)
     self.D_Y = Discriminator('D_Y',
         self.is_training, norm=norm, use_sigmoid=use_sigmoid)
-    self.F = Generator('F', self.is_training, norm=norm, image_size=image_size)
+    self.F = Generator('F', self.is_training, ngf=ngf, norm=norm, image_size=image_size)
     self.D_X = Discriminator('D_X',
         self.is_training, norm=norm, use_sigmoid=use_sigmoid)
 

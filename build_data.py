@@ -11,14 +11,14 @@ except ImportError:
 
 FLAGS = tf.flags.FLAGS
 
-tf.flags.DEFINE_string('X_input_dir', 'data/apple2orange/trainA',
-                       'X input directory, default: data/apple2orange/trainA')
-tf.flags.DEFINE_string('Y_input_dir', 'data/apple2orange/trainB',
-                       'Y input directory, default: data/apple2orange/trainB')
-tf.flags.DEFINE_string('X_output_file', 'data/tfrecords/apple.tfrecords',
-                       'X output tfrecords file, default: data/tfrecords/apple.tfrecords')
-tf.flags.DEFINE_string('Y_output_file', 'data/tfrecords/orange.tfrecords',
-                       'Y output tfrecords file, default: data/tfrecords/orange.tfrecords')
+tf.flags.DEFINE_string('X_input_dir', 'data/iphone2dslr_flower/trainA',
+                       'X input directory, default: data/iphone2dslr_flower/trainA')
+tf.flags.DEFINE_string('Y_input_dir', 'data/iphone2dslr_flower/trainB',
+                       'Y input directory, default: data/iphone2dslr_flower/trainB')
+tf.flags.DEFINE_string('X_output_file', 'data/tfrecords/iphone.tfrecords',
+                       'X output tfrecords file, default: data/tfrecords/iphone.tfrecords')
+tf.flags.DEFINE_string('Y_output_file', 'data/tfrecords/dslr.tfrecords',
+                       'Y output tfrecords file, default: data/tfrecords/dslr.tfrecords')
 
 
 def data_reader(input_dir, shuffle=True):

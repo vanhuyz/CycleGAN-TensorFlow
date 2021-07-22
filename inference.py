@@ -1,6 +1,6 @@
 """Translate an image to another image
 An example of command-line usage is:
-python export_graph.py --model pretrained/apple2orange.pb \
+python inference.py --model pretrained/apple2orange.pb \
                        --input input_sample.jpg \
                        --output output_sample.jpg \
                        --image_size 256

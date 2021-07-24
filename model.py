@@ -47,7 +47,7 @@ class CycleGAN:
         self.X_train_file = X_train_file
         self.Y_train_file = Y_train_file
 
-        self.is_training = tf.placeholder_with_default(True, shape=[], name='is_training')
+        self.is_training = tf.compat.v1.placeholder_with_default(True, shape=[], name='is_training')
 
         self.G = Generator('G', self.is_training, ngf=ngf, norm=norm, image_size=image_size)
         self.D_Y = Discriminator('D_Y',
@@ -56,9 +56,9 @@ class CycleGAN:
         self.D_X = Discriminator('D_X',
                                  self.is_training, norm=norm, use_sigmoid=use_sigmoid)
 
-        self.fake_x = tf.placeholder(tf.float32,
+        self.fake_x = tf.compat.v1.placeholder(tf.float32,
                                      shape=[batch_size, image_size, image_size, 3])
-        self.fake_y = tf.placeholder(tf.float32,
+        self.fake_y = tf.compat.v1.placeholder(tf.float32,
                                      shape=[batch_size, image_size, image_size, 3])
 
     def model(self):
@@ -117,7 +117,7 @@ class CycleGAN:
             learning_rate = (
                 tf.where(
                     tf.greater_equal(global_step, start_decay_step),
-                    tf.train.polynomial_decay(starter_learning_rate, global_step - start_decay_step,
+                    tf.compat.v1.train.polynomial_decay(starter_learning_rate, global_step - start_decay_step,
                                               decay_steps, end_learning_rate,
                                               power=1.0),
                     starter_learning_rate
@@ -127,7 +127,7 @@ class CycleGAN:
             tf.summary.scalar('learning_rate/{}'.format(name), learning_rate)
 
             learning_step = (
-                tf.train.AdamOptimizer(learning_rate, beta1=beta1, name=name)
+                tf.compat.v1.train.AdamOptimizer(learning_rate, beta1=beta1, name=name)
                     .minimize(loss, global_step=global_step, var_list=variables)
             )
             return learning_step
@@ -152,7 +152,7 @@ class CycleGAN:
     """
         if use_lsgan:
             # use mean squared error
-            error_real = tf.reduce_mean(tf.squared_difference(D(y), REAL_LABEL))
+            error_real = tf.reduce_mean(tf.math.squared_difference(D(y), REAL_LABEL))
             error_fake = tf.reduce_mean(tf.square(D(fake_y)))
         else:
             # use cross entropy
@@ -166,7 +166,7 @@ class CycleGAN:
     """
         if use_lsgan:
             # use mean squared error
-            loss = tf.reduce_mean(tf.squared_difference(D(fake_y), REAL_LABEL))
+            loss = tf.reduce_mean(tf.math.squared_difference(D(fake_y), REAL_LABEL))
         else:
             # heuristic, non-saturating loss
             loss = -tf.reduce_mean(ops.safe_log(D(fake_y))) / 2

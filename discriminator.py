@@ -18,7 +18,7 @@ class Discriminator:
       output: 4D tensor batch_size x out_size x out_size x 1 (default 1x5x5x1)
               filled with 0.9 if real, 0.0 if fake
     """
-        with tf.variable_scope(self.name):
+        with tf.compat.v1.variable_scope(self.name):
             # convolution layers
             C64 = ops.Ck(input, 64, reuse=self.reuse, norm=None,
                          is_training=self.is_training, name='C64')  # (?, w/2, h/2, 64)
@@ -35,6 +35,6 @@ class Discriminator:
                                    use_sigmoid=self.use_sigmoid, name='output')  # (?, w/16, h/16, 1)
 
         self.reuse = True
-        self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
+        self.variables = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
 
         return output

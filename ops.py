@@ -17,7 +17,7 @@ def c7s1_k(input, k, reuse=False, norm='instance', activation='relu', is_trainin
   Returns:
     4D tensor
   """
-    with tf.variable_scope(name, reuse=reuse):
+    with tf.compat.v1.variable_scope(name, reuse=reuse):
         weights = _weights("weights",
                            shape=[7, 7, input.get_shape()[3], k])
 
@@ -47,7 +47,7 @@ def dk(input, k, reuse=False, norm='instance', is_training=True, name=None):
   Returns:
     4D tensor
   """
-    with tf.variable_scope(name, reuse=reuse):
+    with tf.compat.v1.variable_scope(name, reuse=reuse):
         weights = _weights("weights",
                            shape=[3, 3, input.get_shape()[3], k])
 
@@ -69,8 +69,8 @@ def Rk(input, k, reuse=False, norm='instance', is_training=True, name=None):
   Returns:
     4D tensor (same shape as input)
   """
-    with tf.variable_scope(name, reuse=reuse):
-        with tf.variable_scope('layer1', reuse=reuse):
+    with tf.compat.v1.variable_scope(name, reuse=reuse):
+        with tf.compat.v1.variable_scope('layer1', reuse=reuse):
             weights1 = _weights("weights1",
                                 shape=[3, 3, input.get_shape()[3], k])
             padded1 = tf.pad(input, [[0, 0], [1, 1], [1, 1], [0, 0]], 'REFLECT')
@@ -79,7 +79,7 @@ def Rk(input, k, reuse=False, norm='instance', is_training=True, name=None):
             normalized1 = _norm(conv1, is_training, norm)
             relu1 = tf.nn.relu(normalized1)
 
-        with tf.variable_scope('layer2', reuse=reuse):
+        with tf.compat.v1.variable_scope('layer2', reuse=reuse):
             weights2 = _weights("weights2",
                                 shape=[3, 3, relu1.get_shape()[3], k])
 
@@ -113,7 +113,7 @@ def uk(input, k, reuse=False, norm='instance', is_training=True, name=None, outp
   Returns:
     4D tensor
   """
-    with tf.variable_scope(name, reuse=reuse):
+    with tf.compat.v1.variable_scope(name, reuse=reuse):
         input_shape = input.get_shape().as_list()
 
         weights = _weights("weights",
@@ -145,7 +145,7 @@ def Ck(input, k, slope=0.2, stride=2, reuse=False, norm='instance', is_training=
   Returns:
     4D tensor
   """
-    with tf.variable_scope(name, reuse=reuse):
+    with tf.compat.v1.variable_scope(name, reuse=reuse):
         weights = _weights("weights",
                            shape=[4, 4, input.get_shape()[3], k])
 
@@ -166,7 +166,7 @@ def last_conv(input, reuse=False, use_sigmoid=False, name=None):
     use_sigmoid: boolean (False if use lsgan)
     name: string, e.g. 'C64'
   """
-    with tf.variable_scope(name, reuse=reuse):
+    with tf.compat.v1.variable_scope(name, reuse=reuse):
         weights = _weights("weights",
                            shape=[4, 4, input.get_shape()[3], 1])
         biases = _biases("biases", [1])
@@ -190,9 +190,9 @@ def _weights(name, shape, mean=0.0, stddev=0.02):
   Returns:
     A trainable variable
   """
-    var = tf.get_variable(
+    var = tf.compat.v1.get_variable(
         name, shape,
-        initializer=tf.random_normal_initializer(
+        initializer=tf.compat.v1.random_normal_initializer(
             mean=mean, stddev=stddev, dtype=tf.float32))
     return var
 
@@ -200,8 +200,8 @@ def _weights(name, shape, mean=0.0, stddev=0.02):
 def _biases(name, shape, constant=0.0):
     """ Helper to create an initialized Bias with constant
   """
-    return tf.get_variable(name, shape,
-                           initializer=tf.constant_initializer(constant))
+    return tf.compat.v1.get_variable(name, shape,
+                                     initializer=tf.constant_initializer(constant))
 
 
 def _leaky_relu(input, slope):
@@ -222,27 +222,27 @@ def _norm(input, is_training, norm='instance'):
 def _batch_norm(input, is_training):
     """ Batch Normalization
   """
-    with tf.variable_scope("batch_norm"):
-        return tf.contrib.layers.batch_norm(input,
-                                            decay=0.9,
-                                            scale=True,
-                                            updates_collections=None,
-                                            is_training=is_training)
+    with tf.compat.v1.variable_scope("batch_norm"):
+        return tf.compat.v1.layers.batch_normalization(input,
+                                                       decay=0.9,
+                                                       scale=True,
+                                                       updates_collections=None,
+                                                       is_training=is_training)
 
 
 def _instance_norm(input):
     """ Instance Normalization
   """
-    with tf.variable_scope("instance_norm"):
+    with tf.compat.v1.variable_scope("instance_norm"):
         depth = input.get_shape()[3]
         scale = _weights("scale", [depth], mean=1.0)
         offset = _biases("offset", [depth])
-        mean, variance = tf.nn.moments(input, axes=[1, 2], keep_dims=True)
+        mean, variance = tf.nn.moments(input, axes=[1, 2], keepdims=True)
         epsilon = 1e-5
-        inv = tf.rsqrt(variance + epsilon)
+        inv = tf.math.rsqrt(variance + epsilon)
         normalized = (input - mean) * inv
         return scale * normalized + offset
 
 
 def safe_log(x, eps=1e-12):
-    return tf.log(x + eps)
+    return tf.math.log(x + eps)

@@ -19,7 +19,7 @@ class Generator:
     Returns:
       output: same size as input
     """
-        with tf.variable_scope(self.name):
+        with tf.compat.v1.variable_scope(self.name):
             # conv layers
             c7s1_32 = ops.c7s1_k(input, self.ngf, is_training=self.is_training, norm=self.norm,
                                  reuse=self.reuse, name='c7s1_32')  # (?, w, h, 32)
@@ -48,7 +48,7 @@ class Generator:
                                 activation='tanh', reuse=self.reuse, name='output')  # (?, w, h, 3)
         # set reuse=True for next call
         self.reuse = True
-        self.variables = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
+        self.variables = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES, scope=self.name)
 
         return output
 

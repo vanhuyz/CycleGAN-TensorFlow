@@ -17,7 +17,7 @@ class Reader():
         self.min_queue_examples = min_queue_examples
         self.batch_size = batch_size
         self.num_threads = num_threads
-        self.reader = tf.TFRecordReader()
+        self.reader = tf.compat.v1.TFRecordReader()
         self.name = name
 
     def feed(self):
@@ -26,21 +26,21 @@ class Reader():
       images: 4D tensor [batch_size, image_width, image_height, image_depth]
     """
         with tf.name_scope(self.name):
-            filename_queue = tf.train.string_input_producer([self.tfrecords_file])
-            reader = tf.TFRecordReader()
+            filename_queue = tf.compat.v1.train.string_input_producer([self.tfrecords_file])
+            reader = tf.compat.v1.TFRecordReader()
 
             _, serialized_example = self.reader.read(filename_queue)
-            features = tf.parse_single_example(
+            features = tf.compat.v1.parse_single_example(
                 serialized_example,
                 features={
-                    'image/file_name': tf.FixedLenFeature([], tf.string),
-                    'image/encoded_image': tf.FixedLenFeature([], tf.string),
+                    'image/file_name': tf.compat.v1.FixedLenFeature([], tf.string),
+                    'image/encoded_image': tf.compat.v1.FixedLenFeature([], tf.string),
                 })
 
             image_buffer = features['image/encoded_image']
             image = tf.image.decode_jpeg(image_buffer, channels=3)
             image = self._preprocess(image)
-            images = tf.train.shuffle_batch(
+            images = tf.compat.v1.train.shuffle_batch(
                 [image], batch_size=self.batch_size, num_threads=self.num_threads,
                 capacity=self.min_queue_examples + 3 * self.batch_size,
                 min_after_dequeue=self.min_queue_examples
@@ -50,15 +50,15 @@ class Reader():
         return images
 
     def _preprocess(self, image):
-        image = tf.image.resize_images(image, size=(self.image_size, self.image_size))
+        image = tf.image.resize(image, size=(self.image_size, self.image_size))
         image = utils.convert2float(image)
         image.set_shape([self.image_size, self.image_size, 3])
         return image
 
 
 def test_reader():
-    TRAIN_FILE_1 = 'data/tfrecords/apple.tfrecords'
-    TRAIN_FILE_2 = 'data/tfrecords/orange.tfrecords'
+    TRAIN_FILE_1 = 'data/tfrecords/ukiyoe.tfrecords'
+    TRAIN_FILE_2 = 'data/tfrecords/photo.tfrecords'
 
     with tf.Graph().as_default():
         reader1 = Reader(TRAIN_FILE_1, batch_size=2)

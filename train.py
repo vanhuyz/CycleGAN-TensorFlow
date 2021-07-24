@@ -1,37 +1,36 @@
 import tensorflow as tf
 from model import CycleGAN
-from reader import Reader
 from datetime import datetime
 import os
 import logging
 from utils import ImagePool
 
-FLAGS = tf.flags.FLAGS
+FLAGS = tf.compat.v1.flags.FLAGS
 
-tf.flags.DEFINE_integer('batch_size', 1, 'batch size, default: 1')
-tf.flags.DEFINE_integer('image_size', 256, 'image size, default: 256')
-tf.flags.DEFINE_bool('use_lsgan', True,
+tf.compat.v1.flags.DEFINE_integer('batch_size', 1, 'batch size, default: 1')
+tf.compat.v1.flags.DEFINE_integer('image_size', 256, 'image size, default: 256')
+tf.compat.v1.flags.DEFINE_bool('use_lsgan', True,
                      'use lsgan (mean squared error) or cross entropy loss, default: True')
-tf.flags.DEFINE_string('norm', 'instance',
+tf.compat.v1.flags.DEFINE_string('norm', 'instance',
                        '[instance, batch] use instance norm or batch norm, default: instance')
-tf.flags.DEFINE_integer('lambda1', 10,
+tf.compat.v1.flags.DEFINE_integer('lambda1', 10,
                         'weight for forward cycle loss (X->Y->X), default: 10')
-tf.flags.DEFINE_integer('lambda2', 10,
+tf.compat.v1.flags.DEFINE_integer('lambda2', 10,
                         'weight for backward cycle loss (Y->X->Y), default: 10')
-tf.flags.DEFINE_float('learning_rate', 2e-4,
+tf.compat.v1.flags.DEFINE_float('learning_rate', 2e-4,
                       'initial learning rate for Adam, default: 0.0002')
-tf.flags.DEFINE_float('beta1', 0.5,
+tf.compat.v1.flags.DEFINE_float('beta1', 0.5,
                       'momentum term of Adam, default: 0.5')
-tf.flags.DEFINE_float('pool_size', 50,
+tf.compat.v1.flags.DEFINE_float('pool_size', 50,
                       'size of image buffer that stores previously generated images, default: 50')
-tf.flags.DEFINE_integer('ngf', 64,
+tf.compat.v1.flags.DEFINE_integer('ngf', 64,
                         'number of gen filters in first conv layer, default: 64')
 
-tf.flags.DEFINE_string('X', 'data/tfrecords/apple.tfrecords',
-                       'X tfrecords file for training, default: data/tfrecords/apple.tfrecords')
-tf.flags.DEFINE_string('Y', 'data/tfrecords/orange.tfrecords',
-                       'Y tfrecords file for training, default: data/tfrecords/orange.tfrecords')
-tf.flags.DEFINE_string('load_model', None,
+tf.compat.v1.flags.DEFINE_string('X', 'data/tfrecords/ukiyoe.tfrecords',
+                       'X tfrecords file for training, default: data/tfrecords/ukiyoe.tfrecords')
+tf.compat.v1.flags.DEFINE_string('Y', 'data/tfrecords/photo.tfrecords',
+                       'Y tfrecords file for training, default: data/tfrecords/photo.tfrecords')
+tf.compat.v1.flags.DEFINE_string('load_model', None,
                        'folder of saved model that you wish to continue training (e.g. 20170602-1936), default: None')
 
 
@@ -64,23 +63,23 @@ def train():
         G_loss, D_Y_loss, F_loss, D_X_loss, fake_y, fake_x = cycle_gan.model()
         optimizers = cycle_gan.optimize(G_loss, D_Y_loss, F_loss, D_X_loss)
 
-        summary_op = tf.summary.merge_all()
-        train_writer = tf.summary.FileWriter(checkpoints_dir, graph)
-        saver = tf.train.Saver()
+        summary_op = tf.compat.v1.summary.merge_all()
+        train_writer = tf.compat.v1.summary.FileWriter(checkpoints_dir, graph)
+        saver = tf.compat.v1.train.Saver()
 
-    with tf.Session(graph=graph) as sess:
+    with tf.compat.v1.Session(graph=graph) as sess:
         if FLAGS.load_model is not None:
             checkpoint = tf.train.get_checkpoint_state(checkpoints_dir)
             meta_graph_path = checkpoint.model_checkpoint_path + ".meta"
-            restore = tf.train.import_meta_graph(meta_graph_path)
+            restore = tf.compat.v1.train.import_meta_graph(meta_graph_path)
             restore.restore(sess, tf.train.latest_checkpoint(checkpoints_dir))
             step = int(meta_graph_path.split("-")[2].split(".")[0])
         else:
-            sess.run(tf.global_variables_initializer())
+            sess.run(tf.compat.v1.global_variables_initializer())
             step = 0
 
         coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+        threads = tf.compat.v1.train.start_queue_runners(sess=sess, coord=coord)
 
         try:
             fake_Y_pool = ImagePool(FLAGS.pool_size)
@@ -134,4 +133,4 @@ def main(unused_argv):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    tf.app.run()
+    tf.compat.v1.app.run()

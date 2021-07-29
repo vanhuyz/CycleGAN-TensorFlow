@@ -13,48 +13,51 @@ from tensorflow.python.tools.freeze_graph import freeze_graph
 from model import CycleGAN
 import utils
 
-FLAGS = tf.flags.FLAGS
+FLAGS = tf.compat.v1.flags.FLAGS
 
-tf.flags.DEFINE_string('checkpoint_dir', '', 'checkpoints directory path')
-tf.flags.DEFINE_string('XtoY_model', 'apple2orange.pb', 'XtoY model name, default: apple2orange.pb')
-tf.flags.DEFINE_string('YtoX_model', 'orange2apple.pb', 'YtoX model name, default: orange2apple.pb')
-tf.flags.DEFINE_integer('image_size', '256', 'image size, default: 256')
-tf.flags.DEFINE_integer('ngf', 64,
+tf.compat.v1.flags.DEFINE_string('checkpoint_dir', '', 'checkpoints directory path')
+tf.compat.v1.flags.DEFINE_string('XtoY_model', 'apple2orange.pb', 'XtoY model name, default: apple2orange.pb')
+tf.compat.v1.flags.DEFINE_string('YtoX_model', 'orange2apple.pb', 'YtoX model name, default: orange2apple.pb')
+tf.compat.v1.flags.DEFINE_integer('image_size', '256', 'image size, default: 256')
+tf.compat.v1.flags.DEFINE_integer('ngf', 64,
                         'number of gen filters in first conv layer, default: 64')
-tf.flags.DEFINE_string('norm', 'instance',
+tf.compat.v1.flags.DEFINE_string('norm', 'instance',
                        '[instance, batch] use instance norm or batch norm, default: instance')
 
+
 def export_graph(model_name, XtoY=True):
-  graph = tf.Graph()
+    graph = tf.Graph()
 
-  with graph.as_default():
-    cycle_gan = CycleGAN(ngf=FLAGS.ngf, norm=FLAGS.norm, image_size=FLAGS.image_size)
+    with graph.as_default():
+        cycle_gan = CycleGAN(ngf=FLAGS.ngf, norm=FLAGS.norm, image_size=FLAGS.image_size)
 
-    input_image = tf.placeholder(tf.float32, shape=[FLAGS.image_size, FLAGS.image_size, 3], name='input_image')
-    cycle_gan.model()
-    if XtoY:
-      output_image = cycle_gan.G.sample(tf.expand_dims(input_image, 0))
-    else:
-      output_image = cycle_gan.F.sample(tf.expand_dims(input_image, 0))
+        input_image = tf.compat.v1.placeholder(tf.float32, shape=[FLAGS.image_size, FLAGS.image_size, 3], name='input_image')
+        cycle_gan.model()
+        if XtoY:
+            output_image = cycle_gan.G.sample(tf.expand_dims(input_image, 0))
+        else:
+            output_image = cycle_gan.F.sample(tf.expand_dims(input_image, 0))
 
-    output_image = tf.identity(output_image, name='output_image')
-    restore_saver = tf.train.Saver()
-    export_saver = tf.train.Saver()
+        output_image = tf.identity(output_image, name='output_image')
+        restore_saver = tf.compat.v1.train.Saver()
+        export_saver = tf.compat.v1.train.Saver()
 
-  with tf.Session(graph=graph) as sess:
-    sess.run(tf.global_variables_initializer())
-    latest_ckpt = tf.train.latest_checkpoint(FLAGS.checkpoint_dir)
-    restore_saver.restore(sess, latest_ckpt)
-    output_graph_def = tf.graph_util.convert_variables_to_constants(
-        sess, graph.as_graph_def(), [output_image.op.name])
+    with tf.compat.v1.Session(graph=graph) as sess:
+        sess.run(tf.compat.v1.global_variables_initializer())
+        latest_ckpt = tf.train.latest_checkpoint(FLAGS.checkpoint_dir)
+        restore_saver.restore(sess, latest_ckpt)
+        output_graph_def = tf.compat.v1.graph_util.convert_variables_to_constants(
+            sess, graph.as_graph_def(), [output_image.op.name])
 
-    tf.train.write_graph(output_graph_def, 'pretrained', model_name, as_text=False)
+        tf.compat.v1.train.write_graph(output_graph_def, 'pretrained', model_name, as_text=False)
+
 
 def main(unused_argv):
-  print('Export XtoY model...')
-  export_graph(FLAGS.XtoY_model, XtoY=True)
-  print('Export YtoX model...')
-  export_graph(FLAGS.YtoX_model, XtoY=False)
+    print('Export XtoY model...')
+    export_graph(FLAGS.XtoY_model, XtoY=True)
+    print('Export YtoX model...')
+    export_graph(FLAGS.YtoX_model, XtoY=False)
+
 
 if __name__ == '__main__':
-  tf.app.run()
+    tf.compat.v1.app.run()

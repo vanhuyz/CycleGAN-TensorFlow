@@ -2,8 +2,8 @@
 This makes file size smaller and can be used for inference in production.
 An example of command-line usage is:
 python export_graph.py --checkpoint_dir checkpoints/20170424-1152 \
-                       --XtoY_model ukiyoe2photo.pb \
-                       --YtoX_model photo2ukiyoe.pb \
+                       --XtoY_model apple2orange.pb \
+                       --YtoX_model orange2apple.pb \
                        --image_size 256
 """
 
@@ -16,8 +16,8 @@ import utils
 FLAGS = tf.compat.v1.flags.FLAGS
 
 tf.compat.v1.flags.DEFINE_string('checkpoint_dir', '', 'checkpoints directory path')
-tf.compat.v1.flags.DEFINE_string('XtoY_model', 'ukiyoe2photo.pb', 'XtoY model name, default: ukiyoe2photo.pb')
-tf.compat.v1.flags.DEFINE_string('YtoX_model', 'photo2ukiyoe.pb', 'YtoX model name, default: photo2ukiyoe.pb')
+tf.compat.v1.flags.DEFINE_string('XtoY_model', 'apple2orange.pb', 'XtoY model name, default: apple2orange.pb')
+tf.compat.v1.flags.DEFINE_string('YtoX_model', 'orange2apple.pb', 'YtoX model name, default: orange2apple.pb')
 tf.compat.v1.flags.DEFINE_integer('image_size', '256', 'image size, default: 256')
 tf.compat.v1.flags.DEFINE_integer('ngf', 64,
                         'number of gen filters in first conv layer, default: 64')

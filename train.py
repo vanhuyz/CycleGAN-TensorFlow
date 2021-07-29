@@ -26,10 +26,10 @@ tf.compat.v1.flags.DEFINE_float('pool_size', 50,
 tf.compat.v1.flags.DEFINE_integer('ngf', 64,
                         'number of gen filters in first conv layer, default: 64')
 
-tf.compat.v1.flags.DEFINE_string('X', 'data/tfrecords/ukiyoe.tfrecords',
-                       'X tfrecords file for training, default: data/tfrecords/ukiyoe.tfrecords')
-tf.compat.v1.flags.DEFINE_string('Y', 'data/tfrecords/photo.tfrecords',
-                       'Y tfrecords file for training, default: data/tfrecords/photo.tfrecords')
+tf.compat.v1.flags.DEFINE_string('X', 'data/tfrecords/apple.tfrecords',
+                       'X tfrecords file for training, default: data/tfrecords/apple.tfrecords')
+tf.compat.v1.flags.DEFINE_string('Y', 'data/tfrecords/orange.tfrecords',
+                       'Y tfrecords file for training, default: data/tfrecords/orange.tfrecords')
 tf.compat.v1.flags.DEFINE_string('load_model', None,
                        'folder of saved model that you wish to continue training (e.g. 20170602-1936), default: None')
 

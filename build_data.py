@@ -10,14 +10,14 @@ except ImportError:
 
 FLAGS = tf.compat.v1.flags.FLAGS
 
-tf.compat.v1.flags.DEFINE_string('X_input_dir', 'data/ukiyoe2photo/trainA',
-                       'X input directory, default: data/ukiyoe2photo/trainA')
-tf.compat.v1.flags.DEFINE_string('Y_input_dir', 'data/ukiyoe2photo/trainB',
-                       'Y input directory, default: data/ukiyoe2photo/trainB')
-tf.compat.v1.flags.DEFINE_string('X_output_file', 'data/tfrecords/ukiyoe.tfrecords',
-                       'X output tfrecords file, default: data/tfrecords/ukiyoe.tfrecords')
-tf.compat.v1.flags.DEFINE_string('Y_output_file', 'data/tfrecords/photo.tfrecords',
-                       'Y output tfrecords file, default: data/tfrecords/photo.tfrecords')
+tf.compat.v1.flags.DEFINE_string('X_input_dir', 'data/apple2orange/trainA',
+                       'X input directory, default: data/apple2orange/trainA')
+tf.compat.v1.flags.DEFINE_string('Y_input_dir', 'data/apple2orange/trainB',
+                       'Y input directory, default: data/apple2orange/trainB')
+tf.compat.v1.flags.DEFINE_string('X_output_file', 'data/tfrecords/apple.tfrecords',
+                       'X output tfrecords file, default: data/tfrecords/apple.tfrecords')
+tf.compat.v1.flags.DEFINE_string('Y_output_file', 'data/tfrecords/orange.tfrecords',
+                       'Y output tfrecords file, default: data/tfrecords/orange.tfrecords')
 
 
 def data_reader(input_dir, shuffle=True):
